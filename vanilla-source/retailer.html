@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retailer Portal - Vikas Automobiles</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/retailer.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="bg-[#0B192C] text-slate-100 min-h-full flex font-sans overflow-hidden">
+
+  <!-- Left Sidebar (Drawer) -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <div class="h-16 px-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="bg-orange-500 text-[#0B192C] p-1.5 rounded-md">
+          <i data-lucide="store" class="w-5 h-5 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <span class="font-black text-sm tracking-tight text-white uppercase block leading-none">Vikas</span>
+          <span class="text-[9px] text-orange-400 tracking-widest font-mono uppercase font-bold leading-none">Automobiles</span>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+        <i data-lucide="chevrons-left" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- User Profile Area -->
+    <div class="p-4 border-b border-slate-800 flex items-center gap-3 bg-slate-950/20">
+      <div class="relative">
+        <img id="sidebar-avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop" alt="Profile" 
+          class="w-10 h-10 rounded-full object-cover border border-orange-500/40 referrerpolicy='no-referrer'">
+        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-900"></span>
+      </div>
+      <div class="min-w-0">
+        <span id="sidebar-username" class="font-bold text-white text-xs block truncate">Loading Partner...</span>
+        <span class="text-[9px] text-slate-500 font-mono uppercase tracking-wider block" id="sidebar-tier">BRONZE MEMBER</span>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu Links -->
+    <nav class="flex-grow p-4 space-y-1 overflow-y-auto" id="sidebar-menu">
+      <button onclick="switchTab('dashboard')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-bold rounded-lg text-white bg-[#FF6B00] transition text-left">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span>My Dashboard</span>
+      </button>
+      <button onclick="switchTab('catalog')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="book-open" class="w-4 h-4"></i>
+        <span>Parts Catalog</span>
+      </button>
+      <button onclick="switchTab('scanner')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="scan-line" class="w-4 h-4"></i>
+        <span>Scan QR Code</span>
+      </button>
+      <button onclick="switchTab('ledger')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="receipt" class="w-4 h-4"></i>
+        <span>Loyalty Ledger</span>
+      </button>
+      <button onclick="switchTab('rewards')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="gift" class="w-4 h-4"></i>
+        <span>Redeem Cashback</span>
+      </button>
+      <button onclick="switchTab('support')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="phone-call" class="w-4 h-4"></i>
+        <span>Support Center</span>
+      </button>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t border-slate-800">
+      <button onclick="handleLogout()" class="w-full py-2 bg-slate-950 hover:bg-red-950 hover:text-red-400 text-slate-400 font-bold text-xs rounded-lg border border-slate-800 transition flex items-center justify-center gap-2">
+        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <div class="flex-grow flex flex-col min-w-0 md:ml-64 h-full overflow-hidden">
+    <!-- Navbar -->
+    <header class="h-16 border-b border-slate-800 bg-slate-900/40 backdrop-blur px-4 flex items-center justify-between sticky top-0 z-30">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="text-orange-400 font-bold">Retailer Partner</span>
+          <span class="text-slate-600">/</span>
+          <span id="breadcrumb-title" class="text-slate-400 capitalize">My Dashboard</span>
+        </div>
+      </div>
+
+      <!-- Quick Balance -->
+      <div class="flex items-center gap-3">
+        <div class="bg-[#FF6B00]/10 border border-[#FF6B00]/20 rounded-lg px-3 py-1.5 flex items-center gap-2">
+          <i data-lucide="award" class="w-4 h-4 text-[#FF6B00]"></i>
+          <div class="text-right leading-none">
+            <span class="text-[9px] text-slate-500 uppercase font-bold font-mono tracking-wider block">Wallet Balance</span>
+            <span class="text-xs font-black text-white font-mono" id="nav-points-balance">0 Pts</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scroll workspace -->
+    <main class="flex-grow p-4 sm:p-6 overflow-y-auto relative">
+      
+      <!-- Panel 1: Dashboard -->
+      <section id="panel-dashboard" class="panel space-y-6">
+        <!-- Greetings and Tier tracker -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
+            <div class="space-y-2 z-10">
+              <span class="text-[10px] text-orange-400 font-mono tracking-widest uppercase font-bold block" id="dash-greeting-time">Good Morning, Partner</span>
+              <h2 class="text-2xl font-black text-white leading-tight" id="dash-welcome-name">Welcome, Vikas Automobiles Partner</h2>
+              <p class="text-xs text-slate-400 leading-relaxed max-w-md">
+                Accumulate genuine points by scanning QR codes pasted on parts labels, and convert them to direct Paytm, PhonePe, or bank transfer cashback instant.
+              </p>
+            </div>
+            <!-- Interactive Tier card -->
+            <div class="shrink-0 bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center w-full sm:w-44 space-y-2 z-10">
+              <span class="text-[9px] text-slate-500 font-mono font-bold tracking-widest block uppercase">Current Tier</span>
+              <div class="inline-flex p-3 rounded-full bg-orange-500/10 text-[#FF6B00] mb-1" id="dash-tier-icon">
+                <i data-lucide="shield" class="w-8 h-8"></i>
+              </div>
+              <h4 class="text-xs font-black text-white uppercase tracking-wider" id="dash-tier-name">BRONZE TIER</h4>
+              <p class="text-[9px] text-slate-500 font-mono" id="dash-tier-points">0 Pts accumulated</p>
+            </div>
+            <!-- Ambient backgrounds -->
+            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl"></div>
+          </div>
+
+          <!-- Points Breakdown -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2">Loyalty points Audit</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <span class="text-[9px] text-slate-500 font-mono uppercase block font-semibold">Approved Wallet</span>
+                <span class="text-lg font-black text-emerald-400 font-mono" id="dash-points-approved">0</span>
+              </div>
+              <div>
+                <span class="text-[9px] text-slate-500 font-mono uppercase block font-semibold">Redeemed Cash</span>
+                <span class="text-lg font-black text-slate-400 font-mono" id="dash-points-redeemed">₹ 0.00</span>
+              </div>
+              <div>
+                <span class="text-[9px] text-slate-500 font-mono uppercase block font-semibold">Pending Approvals</span>
+                <span class="text-lg font-black text-amber-500 font-mono" id="dash-points-pending">0</span>
+              </div>
+              <div>
+                <span class="text-[9px] text-slate-500 font-mono uppercase block font-semibold">All-time Earned</span>
+                <span class="text-lg font-black text-white font-mono" id="dash-points-total">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Latest notices announcement -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2 flex items-center gap-2">
+            <i data-lucide="megaphone" class="w-4 h-4 text-orange-400 animate-bounce"></i>
+            <span>Important Scheme Notices</span>
+          </h3>
+          <div class="space-y-3" id="partner-notices-feed">
+            <p class="text-xs text-slate-500 font-mono text-center py-6">No recent corporate announcements.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 2: Parts Catalog -->
+      <section id="panel-catalog" class="panel space-y-6 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="font-bold text-white text-sm">Spare Parts Loyalty Rewards Catalog</h3>
+              <p class="text-xs text-slate-500">Search specific components to verify MRP, your wholesale rates, and points payouts.</p>
+            </div>
+            <input type="text" id="catalog-search" oninput="handleCatalogSearch(this.value)" placeholder="Search Name, Brand, Category..."
+              class="w-full sm:w-64 px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none">
+          </div>
+
+          <!-- Product Grid -->
+          <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <!-- Dynamic elements loaded via js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 3: QR Scanner Simulator -->
+      <section id="panel-scanner" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Simulator controller -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 h-fit">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2">Sticker Scanner Utility</h3>
+            <div class="space-y-4 text-xs">
+              <p class="text-slate-400 leading-relaxed">
+                Provide scan verification manually or let the app simulate a camera feedback capture to parse the point stickers.
+              </p>
+
+              <!-- Simulated manual input form -->
+              <div class="space-y-3.5 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <span class="text-[9px] text-slate-500 font-mono block uppercase font-bold">Manual Sticker Encoding</span>
+                <div>
+                  <label class="block font-bold text-slate-400 mb-1">Select Product sticker</label>
+                  <select id="scan-select-product" onchange="calculateMockScanPoints()"
+                    class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white focus:outline-none text-xs">
+                    <option value="">-- Choose Product --</option>
+                  </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-400 mb-1">Quantity</label>
+                    <input type="number" id="scan-qty" value="1" min="1" oninput="calculateMockScanPoints()"
+                      class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white focus:outline-none text-xs">
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-400 mb-1">Computed Points</label>
+                    <input type="text" id="scan-computed-pts" value="0 Pts" readonly
+                      class="w-full px-3 py-2 bg-slate-850 border border-slate-800 rounded-lg text-slate-500 cursor-not-allowed text-xs font-mono">
+                  </div>
+                </div>
+                <button onclick="submitManualLoyaltyScanClaim()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg transition shadow-lg shadow-orange-600/20">
+                  Submit Scan to Warehouse
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Camera simulator screen -->
+          <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2">Active Camera Scanner Feed</h3>
+            
+            <div class="flex-grow flex flex-col items-center justify-center p-6 bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden min-h-[300px]">
+              <!-- Scanner overlay guide box -->
+              <div class="w-48 h-48 border-2 border-dashed border-[#FF6B00] rounded-xl flex flex-col items-center justify-center relative bg-slate-900/40 z-10 shadow-2xl">
+                <!-- Laser line sweep effect -->
+                <div class="absolute inset-x-0 h-0.5 bg-[#FF6B00] shadow-[0_0_15px_#FF6B00] animate-bounce top-1"></div>
+                <i data-lucide="scan" class="w-12 h-12 text-slate-700"></i>
+              </div>
+
+              <!-- Camera status indicator -->
+              <span class="mt-4 text-[10px] text-slate-500 font-mono z-10 flex items-center gap-1.5">
+                <span class="w-2 h-2 bg-slate-800 rounded-full animate-pulse" id="scanner-camera-indicator"></span>
+                Webcam capture offline
+              </span>
+
+              <div class="mt-6 flex gap-3 z-10">
+                <button onclick="simulateCameraScanCapture()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:border-[#FF6B00] text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+                  <i data-lucide="aperture" class="w-4 h-4 text-orange-400"></i>
+                  <span>Trigger Instant Scan</span>
+                </button>
+              </div>
+
+              <!-- BG decorative canvas grid -->
+              <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 4: Loyalty Ledger -->
+      <section id="panel-ledger" class="panel space-y-6 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="font-bold text-white text-sm">Account Point Statement Ledger</h3>
+              <p class="text-xs text-slate-500">History of your approved claims, reward cash-outs, and pending requests.</p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto text-xs">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-slate-500 font-mono text-[9px] uppercase border-b border-slate-800">
+                  <th class="py-2.5">Date</th>
+                  <th class="py-2.5">Operation / Product</th>
+                  <th class="py-2.5">Type</th>
+                  <th class="py-2.5">Points</th>
+                  <th class="py-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody id="ledger-tbody" class="divide-y divide-slate-800/40 font-medium">
+                <tr>
+                  <td colspan="5" class="py-6 text-center text-slate-500 font-mono">Fetching ledger records...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 5: Redeem Rewards / Cashback -->
+      <section id="panel-rewards" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Redemption card form -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 h-fit">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2">Loyalty Cash-Out Form</h3>
+            <form onsubmit="handleRedemptionSubmit(event)" class="space-y-4 text-xs">
+              <div>
+                <label class="block font-bold text-slate-400 mb-1">Select Cashback Value</label>
+                <select id="redeem-amount" required onchange="calculateRedemptionRequiredPoints(this.value)"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none">
+                  <option value="">-- Choose Amount --</option>
+                  <option value="500">₹ 500 Payout (Requires 500 Pts)</option>
+                  <option value="1000">₹ 1,000 Payout (Requires 1000 Pts)</option>
+                  <option value="5000">₹ 5,000 Payout (Requires 5000 Pts)</option>
+                  <option value="10000">₹ 10,000 Payout (Requires 10000 Pts)</option>
+                </select>
+              </div>
+              <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-1 font-mono text-[11px]">
+                <div class="flex justify-between">
+                  <span class="text-slate-500">Required Points:</span>
+                  <span class="font-bold text-white" id="redeem-required-pts">0 Pts</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-500">Your Wallet Balance:</span>
+                  <span class="font-bold text-emerald-400" id="redeem-user-balance">0 Pts</span>
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1">Payout Method</label>
+                <select id="redeem-method" required
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none">
+                  <option value="paytm">Paytm UPI Wallet</option>
+                  <option value="gpay">Google Pay (GPay) Phone Number</option>
+                  <option value="phonepe">PhonePe Mobile Number</option>
+                  <option value="bank">Direct Bank IMPS Account Transfer</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1">Mobile UPI Number / IFSC Bank details</label>
+                <input type="text" id="redeem-details" required placeholder="9123456789@paytm"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none">
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg transition shadow-lg shadow-orange-600/20">
+                Submit Redemption Request
+              </button>
+            </form>
+          </div>
+
+          <!-- Cashback rules and catalogs explanation -->
+          <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2">Verified Redemption Rules</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Grid item 1 -->
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <span class="text-[9px] text-[#FF6B00] font-mono block uppercase font-bold">1:1 Conversion Guaranteed</span>
+                <p class="text-xs text-slate-300">Every 1 loyalty points accumulated converts to ₹ 1.00 directly across all tiers.</p>
+              </div>
+              <!-- Grid item 2 -->
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <span class="text-[9px] text-purple-400 font-mono block uppercase font-bold">Payouts processing</span>
+                <p class="text-xs text-slate-300">Redemption payouts are validated by Vikas Automobiles staff and disbursed within 24 hours.</p>
+              </div>
+            </div>
+
+            <!-- Active claims list -->
+            <div class="pt-4 border-t border-slate-800/80 space-y-3.5">
+              <h4 class="font-bold text-white text-xs">Recent Redemption Claims Status</h4>
+              <div class="overflow-x-auto text-xs">
+                <table class="w-full text-left">
+                  <thead>
+                    <tr class="text-slate-500 font-mono text-[9px] uppercase border-b border-slate-800">
+                      <th class="py-2">Payout</th>
+                      <th class="py-2">Gateway ID</th>
+                      <th class="py-2 text-right">Processing Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="redemptions-tbody" class="divide-y divide-slate-800/40">
+                    <tr>
+                      <td colspan="3" class="py-4 text-center text-slate-500 font-mono">No recent payouts submitted.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 6: Support Center -->
+      <section id="panel-support" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Support detail widgets -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 h-fit">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2">Direct Support Desk</h3>
+            <div class="space-y-4 text-xs">
+              <div class="flex items-center gap-3 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                  <i data-lucide="phone" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <span class="text-[9px] text-slate-500 block font-mono font-bold uppercase">Call / Whatsapp</span>
+                  <span id="support-phone" class="font-bold text-white block mt-0.5">+91 99999 88888</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                <div class="p-2.5 bg-blue-500/10 text-blue-400 rounded-lg">
+                  <i data-lucide="mail" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <span class="text-[9px] text-slate-500 block font-mono font-bold uppercase">Support Email</span>
+                  <span id="support-email" class="font-bold text-white block mt-0.5">loyalty@vikasautomobiles.com</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat simulator widget -->
+          <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col h-[400px]">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-2">Live Loyalty Support Chat</h3>
+            
+            <!-- Chat logs -->
+            <div class="flex-grow bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-3 overflow-y-auto font-mono text-xs flex flex-col" id="chat-messages-container">
+              <div class="max-w-[80%] p-2.5 rounded-lg bg-slate-900 text-slate-300 self-start leading-relaxed border border-slate-800">
+                <span class="text-[9px] text-orange-400 block font-bold font-sans mb-1 uppercase">Support Desk (Vikas Auto)</span>
+                Hello! How can we assist you with point conversions, scanner camera calibrations, or bulk wholesale purchase order tracking today?
+              </div>
+            </div>
+
+            <!-- Chat input -->
+            <form onsubmit="handleSendSupportMessage(event)" class="flex gap-2 text-xs">
+              <input type="text" id="chat-input" required placeholder="Type your support query..."
+                class="flex-grow px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none">
+              <button type="submit" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg transition flex items-center gap-1">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                <span>Send</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast notification system -->
+  <div id="toast-root" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4 hidden">
+    <div class="w-12 h-12 border-4 border-slate-800 border-t-[#FF6B00] rounded-full animate-spin"></div>
+    <p class="text-xs text-slate-400 font-mono" id="loading-text">Synchronizing user credentials...</p>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/retailer.js"></script>
+  <script>
+    lucide.createIcons();
+    initRetailerPage();
+  </script>
+</body>
+</html>

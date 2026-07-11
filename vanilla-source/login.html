@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Vikas Automobiles Loyalty</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="bg-[#0B192C] text-slate-100 min-h-full flex items-center justify-center font-sans p-4 relative overflow-y-auto">
+
+  <!-- Ambient light -->
+  <div class="absolute -top-40 -left-40 w-96 h-96 bg-[#FF6B00]/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Main Container -->
+  <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 relative z-10 my-8">
+    
+    <!-- Logo & Header -->
+    <div class="text-center space-y-2 mb-8">
+      <div class="inline-flex items-center gap-2 mb-2">
+        <div class="bg-gradient-to-tr from-[#FF6B00] to-amber-500 p-2 rounded-lg text-[#0B192C]">
+          <i data-lucide="wrench" class="w-5 h-5 stroke-[2.5]"></i>
+        </div>
+        <div class="text-left">
+          <span class="font-black text-lg tracking-tight text-white uppercase block leading-none">Vikas</span>
+          <span class="text-[10px] text-[#FF6B00] tracking-widest font-mono uppercase font-bold">Automobiles</span>
+        </div>
+      </div>
+      <h2 class="text-2xl font-black text-white">Welcome Back</h2>
+      <p class="text-slate-400 text-xs">Enter your credentials to access the loyalty portal.</p>
+    </div>
+
+    <!-- Tab Toggles for Login Type -->
+    <div class="grid grid-cols-2 bg-slate-950 p-1 rounded-lg mb-6 border border-slate-800">
+      <button id="tab-password" onclick="switchLoginMode('password')" class="py-2 text-xs font-semibold rounded-md transition-all text-white bg-[#FF6B00]">
+        Password Login
+      </button>
+      <button id="tab-otp" onclick="switchLoginMode('otp')" class="py-2 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-white">
+        OTP / Mobile Login
+      </button>
+    </div>
+
+    <!-- Alerts Container -->
+    <div id="alert-container" class="hidden mb-4 p-3 rounded-lg border text-xs font-medium"></div>
+
+    <!-- Password Form -->
+    <form id="form-login-password" onsubmit="handlePasswordLogin(event)" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="login-identifier">
+          Email or Mobile Number
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="login-identifier" required placeholder="name@email.com or +91 9876543210"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B00] transition">
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-1.5">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400" for="login-password">
+            Password
+          </label>
+          <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-[#FF6B00] hover:underline font-semibold">
+            Forgot Password?
+          </button>
+        </div>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </span>
+          <input type="password" id="login-password" required placeholder="••••••••••••"
+            class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B00] transition">
+          <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember Me & Role select -->
+      <div class="flex items-center justify-between pt-1">
+        <label class="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300">
+          <input type="checkbox" id="remember-me" class="w-4 h-4 rounded bg-slate-950 border-slate-800 accent-[#FF6B00] cursor-pointer">
+          <span class="text-xs select-none font-medium">Remember me</span>
+        </label>
+      </div>
+
+      <button type="submit" id="btn-password-submit" class="w-full py-3 bg-[#FF6B00] text-white rounded-lg hover:bg-[#e05e00] font-bold text-sm transition shadow-lg shadow-[#FF6B00]/20 flex justify-center items-center gap-2">
+        <span>Sign In with Password</span>
+        <i data-lucide="log-in" class="w-4 h-4"></i>
+      </button>
+    </form>
+
+    <!-- OTP Form (Hidden by default) -->
+    <form id="form-login-otp" onsubmit="handleOtpLogin(event)" class="space-y-4 hidden">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="login-mobile-otp">
+          Mobile Number
+        </label>
+        <div class="flex gap-2">
+          <div class="relative flex-grow">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+              <i data-lucide="phone" class="w-4 h-4"></i>
+            </span>
+            <input type="tel" id="login-mobile-otp" placeholder="9876543210" pattern="[0-9]{10}"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+          <button type="button" id="btn-send-otp" onclick="requestOtpCode()" class="px-3 py-2.5 bg-slate-800 border border-slate-700 text-xs text-white rounded-lg hover:bg-slate-700 font-bold transition whitespace-nowrap">
+            Send OTP
+          </button>
+        </div>
+      </div>
+
+      <div id="otp-code-container" class="opacity-40 pointer-events-none transition-all">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="login-otp-value">
+          Enter 6-Digit OTP
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="login-otp-value" maxlength="6" pattern="[0-9]{6}" placeholder="000000"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white tracking-widest font-mono placeholder-slate-500 focus:outline-none focus:border-[#FF6B00] transition">
+        </div>
+        <p class="text-[10px] text-[#FF6B00] mt-1 hidden" id="otp-debug-hint"></p>
+      </div>
+
+      <button type="submit" id="btn-otp-submit" disabled class="w-full py-3 bg-slate-800 text-slate-400 rounded-lg font-bold text-sm transition cursor-not-allowed flex justify-center items-center gap-2">
+        <span>Verify OTP & Sign In</span>
+        <i data-lucide="log-in" class="w-4 h-4"></i>
+      </button>
+    </form>
+
+    <!-- Registration Link -->
+    <div class="mt-6 pt-6 border-t border-slate-800 text-center">
+      <p class="text-xs text-slate-400">
+        New Partner / Professional?
+        <a href="register.html" class="text-[#FF6B00] font-bold hover:underline ml-1">Create Account Now</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-password-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 shadow-2xl relative">
+      <button onclick="closeForgotPasswordModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="flex items-center gap-3">
+        <div class="p-2 rounded-lg bg-[#FF6B00]/10 text-[#FF6B00]">
+          <i data-lucide="key-round" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-white text-base">Reset Password</h3>
+          <p class="text-xs text-slate-400">We'll send you recovery details.</p>
+        </div>
+      </div>
+      <form onsubmit="handleForgotPassword(event)" class="space-y-4 pt-2">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 uppercase mb-1" for="forgot-email">Email Address</label>
+          <input type="email" id="forgot-email" required placeholder="your@email.com"
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00]">
+        </div>
+        <button type="submit" class="w-full py-2 bg-[#FF6B00] hover:bg-[#e05e00] text-white rounded-lg text-sm font-bold transition shadow-lg shadow-[#FF6B00]/20">
+          Request Password Reset
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-root" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4 hidden">
+    <div class="w-12 h-12 border-4 border-slate-800 border-t-[#FF6B00] rounded-full animate-spin"></div>
+    <p class="text-xs text-slate-400 font-mono" id="loading-text">Securing session...</p>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/login.js"></script>
+  <script>
+    lucide.createIcons();
+    initLoginPage();
+  </script>
+</body>
+</html>

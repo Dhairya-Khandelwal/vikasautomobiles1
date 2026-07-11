@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partner Registration - Vikas Automobiles</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="bg-[#0B192C] text-slate-100 min-h-full flex items-center justify-center font-sans p-4 relative overflow-y-auto">
+
+  <!-- Ambient background glow -->
+  <div class="absolute -top-40 -left-40 w-96 h-96 bg-[#FF6B00]/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Main registration container -->
+  <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 relative z-10 my-8">
+    
+    <!-- Header -->
+    <div class="text-center space-y-2 mb-8">
+      <div class="inline-flex items-center gap-2 mb-2">
+        <div class="bg-gradient-to-tr from-[#FF6B00] to-amber-500 p-2 rounded-lg text-[#0B192C]">
+          <i data-lucide="wrench" class="w-5 h-5 stroke-[2.5]"></i>
+        </div>
+        <div class="text-left">
+          <span class="font-black text-lg tracking-tight text-white uppercase block leading-none">Vikas</span>
+          <span class="text-[10px] text-[#FF6B00] tracking-widest font-mono uppercase font-bold">Automobiles</span>
+        </div>
+      </div>
+      <h2 class="text-2xl font-black text-white">Join the Loyalty Rewards Program</h2>
+      <p class="text-slate-400 text-xs">Register to start scanning, earning, and redeeming exclusive prizes.</p>
+    </div>
+
+    <!-- Multi-step Indicator -->
+    <div class="flex items-center justify-between max-w-md mx-auto mb-8 text-xs font-semibold relative">
+      <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-800 -translate-y-1/2 z-0"></div>
+      <div id="step-line-progress" class="absolute top-1/2 left-0 w-0 h-0.5 bg-[#FF6B00] -translate-y-1/2 z-0 transition-all duration-300"></div>
+
+      <div class="z-10 flex flex-col items-center gap-1.5">
+        <span id="badge-step-1" class="w-7 h-7 rounded-full bg-[#FF6B00] text-white flex items-center justify-center font-bold font-mono border-4 border-slate-900 transition-all">1</span>
+        <span class="text-slate-400 text-[10px] uppercase tracking-wider">Account</span>
+      </div>
+      <div class="z-10 flex flex-col items-center gap-1.5">
+        <span id="badge-step-2" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold font-mono border-4 border-slate-900 transition-all">2</span>
+        <span class="text-slate-400 text-[10px] uppercase tracking-wider">Business</span>
+      </div>
+      <div class="z-10 flex flex-col items-center gap-1.5">
+        <span id="badge-step-3" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold font-mono border-4 border-slate-900 transition-all">3</span>
+        <span class="text-slate-400 text-[10px] uppercase tracking-wider">Profile Upload</span>
+      </div>
+    </div>
+
+    <!-- Alert Banner -->
+    <div id="register-alert" class="hidden mb-6 p-4 rounded-lg border text-xs font-semibold"></div>
+
+    <!-- Form -->
+    <form id="form-register" onsubmit="handleRegistrationSubmit(event)" class="space-y-6">
+      
+      <!-- STEP 1: Account Info -->
+      <div id="step-section-1" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-fullname">
+              Full Name <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="text" id="reg-fullname" required placeholder="John Doe"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-usertype">
+              Register As <span class="text-[#FF6B00]">*</span>
+            </label>
+            <select id="reg-usertype" required onchange="toggleUserTypeFields()"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+              <option value="retailer">Retailer (Spare Parts Store)</option>
+              <option value="mechanic">Mechanic (Independent Professional)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-email">
+              Email Address <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="email" id="reg-email" required placeholder="john@example.com"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-mobile">
+              Mobile Number (10 digits) <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="tel" id="reg-mobile" required pattern="[0-9]{10}" placeholder="9876543210"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-password">
+              Secure Password <span class="text-[#FF6B00]">*</span>
+            </label>
+            <div class="relative">
+              <input type="password" id="reg-password" required minlength="6" placeholder="••••••••"
+                class="w-full pl-4 pr-10 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+              <button type="button" onclick="togglePasswordVisibility('reg-password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <!-- Password Strength Indicators -->
+            <div id="password-strength-container" class="mt-2.5 space-y-2 hidden">
+              <!-- Progress Bar -->
+              <div class="flex items-center gap-1.5">
+                <div class="h-1 flex-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div id="strength-bar-1" class="h-full bg-slate-700 transition-all duration-300"></div>
+                </div>
+                <div class="h-1 flex-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div id="strength-bar-2" class="h-full bg-slate-700 transition-all duration-300"></div>
+                </div>
+                <div class="h-1 flex-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div id="strength-bar-3" class="h-full bg-slate-700 transition-all duration-300"></div>
+                </div>
+                <span id="strength-text" class="text-[9px] font-bold font-mono uppercase text-slate-500 tracking-wider">Weak</span>
+              </div>
+              
+              <!-- Checklist Grid -->
+              <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] font-medium text-slate-500">
+                <div id="crit-length" class="flex items-center gap-1 transition-all">
+                  <i data-lucide="circle" class="w-3 h-3 text-slate-600 transition-colors"></i>
+                  <span>8+ Characters</span>
+                </div>
+                <div id="crit-upper" class="flex items-center gap-1 transition-all">
+                  <i data-lucide="circle" class="w-3 h-3 text-slate-600 transition-colors"></i>
+                  <span>Uppercase (A-Z)</span>
+                </div>
+                <div id="crit-number" class="flex items-center gap-1 transition-all">
+                  <i data-lucide="circle" class="w-3 h-3 text-slate-600 transition-colors"></i>
+                  <span>Number (0-9)</span>
+                </div>
+                <div id="crit-special" class="flex items-center gap-1 transition-all">
+                  <i data-lucide="circle" class="w-3 h-3 text-slate-600 transition-colors"></i>
+                  <span>Special Char</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-confirm-password">
+              Confirm Password <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="password" id="reg-confirm-password" required placeholder="••••••••"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+            <div id="password-match-indicator" class="mt-2.5 flex items-center gap-1 text-[10px] font-medium text-slate-500 hidden">
+              <i data-lucide="circle" class="w-3 h-3 text-slate-600 transition-colors"></i>
+              <span id="match-text">Passwords match</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4">
+          <button type="button" onclick="nextStep(2)" class="px-5 py-2.5 bg-[#FF6B00] text-white font-bold text-sm rounded-lg hover:bg-[#e05e00] transition flex items-center gap-1.5 shadow-lg shadow-[#FF6B00]/20">
+            <span>Next Details</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Business details -->
+      <div id="step-section-2" class="space-y-4 hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-firmname">
+              Firm / Garage Name <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="text" id="reg-firmname" required placeholder="Vikas Spares Store or Vikas Garage"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-referral">
+              Referral Code <span class="text-slate-600">(Optional)</span>
+            </label>
+            <input type="text" id="reg-referral" placeholder="VIKAS-500"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white uppercase focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div id="gst-container">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-gst">
+              GSTIN Number <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="text" id="reg-gst" placeholder="22AAAAA1111A1Z1" maxlength="15"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white uppercase focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-pan">
+              PAN Card Number <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="text" id="reg-pan" required placeholder="ABCDE1234F" maxlength="10"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white uppercase focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-address">
+            Complete Office / Store Address <span class="text-[#FF6B00]">*</span>
+          </label>
+          <textarea id="reg-address" required rows="2" placeholder="Building, Street Name, Landmark..."
+            class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-city">
+              City <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="text" id="reg-city" required placeholder="Mumbai"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-state">
+              State <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="text" id="reg-state" required placeholder="Maharashtra"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" for="reg-pincode">
+              Pincode <span class="text-[#FF6B00]">*</span>
+            </label>
+            <input type="text" id="reg-pincode" required pattern="[0-9]{6}" placeholder="400001" maxlength="6"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-[#FF6B00] transition">
+          </div>
+        </div>
+
+        <div class="flex justify-between pt-4">
+          <button type="button" onclick="nextStep(1)" class="px-4 py-2.5 bg-slate-800 text-slate-300 font-bold text-sm rounded-lg hover:bg-slate-700 transition flex items-center gap-1.5">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Previous</span>
+          </button>
+          <button type="button" onclick="nextStep(3)" class="px-5 py-2.5 bg-[#FF6B00] text-white font-bold text-sm rounded-lg hover:bg-[#e05e00] transition flex items-center gap-1.5 shadow-lg shadow-[#FF6B00]/20">
+            <span>Next Upload</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Upload Photo & Submit -->
+      <div id="step-section-3" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            Profile Photo <span class="text-slate-600">(Optional but highly recommended)</span>
+          </label>
+          
+          <!-- Drag and Drop Zone -->
+          <div id="drop-zone" class="border-2 border-dashed border-slate-800 rounded-xl p-8 text-center bg-slate-950/40 hover:border-[#FF6B00] transition cursor-pointer relative group">
+            <input type="file" id="reg-photo-file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handlePhotoFileSelected(this)">
+            <div class="space-y-3 pointer-events-none relative z-10">
+              <div id="drop-icon" class="mx-auto w-12 h-12 rounded-full bg-slate-900 text-slate-400 group-hover:text-[#FF6B00] group-hover:bg-[#FF6B00]/10 flex items-center justify-center transition">
+                <i data-lucide="camera" class="w-6 h-6"></i>
+              </div>
+              <div class="space-y-1">
+                <p class="text-sm font-semibold text-white">Drag & drop profile picture here</p>
+                <p class="text-xs text-slate-500">or click to browse your local directory</p>
+              </div>
+              <span class="inline-block text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded font-mono">JPG, PNG, WEBP (Max 2MB)</span>
+            </div>
+            <!-- Image preview -->
+            <img id="img-profile-preview" src="" alt="Profile Preview" class="absolute inset-0 w-full h-full object-contain bg-slate-950 rounded-xl hidden z-10">
+            <!-- Clear preview button -->
+            <button type="button" id="btn-clear-photo" onclick="clearProfilePhoto(event)" class="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-500 text-white rounded-md z-30 hidden">
+              <i data-lucide="trash" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Terms Agreement -->
+        <label class="flex items-start gap-2.5 cursor-pointer text-slate-400 hover:text-slate-300 pt-2">
+          <input type="checkbox" id="reg-terms" required class="w-4.5 h-4.5 mt-0.5 rounded bg-slate-950 border-slate-800 accent-[#FF6B00]">
+          <span class="text-xs leading-relaxed select-none">
+            I certify that all details provided are authentic, including PAN and GSTIN records. I agree to Vikas Automobiles' privacy guidelines and loyalty points calculation formulas.
+          </span>
+        </label>
+
+        <div class="flex justify-between pt-4">
+          <button type="button" onclick="nextStep(2)" class="px-4 py-2.5 bg-slate-800 text-slate-300 font-bold text-sm rounded-lg hover:bg-slate-700 transition flex items-center gap-1.5">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Previous</span>
+          </button>
+          <button type="submit" id="btn-register-submit" class="px-6 py-2.5 bg-[#FF6B00] text-white font-black text-sm rounded-lg hover:bg-[#e05e00] transition flex items-center gap-1.5 shadow-lg shadow-[#FF6B00]/30">
+            <span>Submit Registration</span>
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Login Link -->
+    <div class="mt-6 pt-6 border-t border-slate-800 text-center">
+      <p class="text-xs text-slate-400">
+        Already a registered partner?
+        <a href="login.html" class="text-[#FF6B00] font-bold hover:underline ml-1">Sign In to Portal</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Toast Root -->
+  <div id="toast-root" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4 hidden">
+    <div class="w-12 h-12 border-4 border-slate-800 border-t-[#FF6B00] rounded-full animate-spin"></div>
+    <p class="text-xs text-slate-400 font-mono" id="loading-text">Encrypting data credentials...</p>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/register.js"></script>
+  <script>
+    lucide.createIcons();
+    initRegisterPage();
+  </script>
+</body>
+</html>

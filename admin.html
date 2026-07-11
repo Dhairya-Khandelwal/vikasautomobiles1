@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Vikas Automobiles</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- QRCode.js library for beautiful QR code generations -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <!-- JSZip library for bulk QR sticker downloads -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <!-- jsPDF for downloading high quality printable PDF cards -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-full flex font-sans overflow-hidden">
+
+  <!-- Left Sidebar -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <div class="h-16 px-4 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 border border-slate-200 shrink-0 shadow-md">
+          <img src="assets/images/hp_logo.png" alt="HP" class="max-w-full max-h-full object-contain" referrerpolicy="no-referrer">
+        </div>
+        <div>
+          <span class="font-black text-[15px] tracking-tight text-slate-900 uppercase block leading-none">Vikas Automobiles</span>
+          <span class="text-[10px] text-blue-600 font-extrabold uppercase tracking-wider mt-1 block leading-none">HPCL Lube Distributor</span>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-600 cursor-pointer">
+        <i data-lucide="chevrons-left" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- User Profile Area -->
+    <div class="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+      <div class="relative">
+        <img id="sidebar-avatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop" alt="Profile" 
+          class="w-10 h-10 rounded-full object-cover border border-blue-600/30" referrerpolicy="no-referrer">
+        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white"></span>
+      </div>
+      <div class="min-w-0">
+        <span id="sidebar-username" class="font-bold text-slate-800 text-xs block truncate">Loading Admin...</span>
+        <span class="text-[9px] text-slate-400 font-mono uppercase tracking-wider block">Staff Operator</span>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu Links -->
+    <nav class="flex-grow p-4 space-y-1 overflow-y-auto" id="sidebar-menu">
+      <button onclick="switchTab('dashboard')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-600 transition text-left cursor-pointer">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span>Dashboard</span>
+      </button>
+      <button onclick="switchTab('users')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        <span>User Management</span>
+      </button>
+      <button onclick="switchTab('products')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="package" class="w-4 h-4"></i>
+        <span>Product Management</span>
+      </button>
+      <button onclick="switchTab('purchases')" class="menu-item w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <div class="flex items-center gap-3">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Purchase Requests</span>
+        </div>
+        <span id="badge-pending-claims" class="hidden bg-blue-600 text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded-full">0</span>
+      </button>
+      <button onclick="switchTab('qr-codes')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="qr-code" class="w-4 h-4"></i>
+        <span>QR Management</span>
+      </button>
+      <button onclick="switchTab('qr-claims')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>
+        <span>QR Code Claims</span>
+      </button>
+      <button onclick="switchTab('rewards')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="gift" class="w-4 h-4 text-purple-600"></i>
+        <span class="font-bold text-slate-800">Rewards Catalogue</span>
+        <span id="badge-pending-redemptions" class="hidden bg-purple-600 text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded-full">0</span>
+      </button>
+      <button onclick="switchTab('notifs')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="megaphone" class="w-4 h-4"></i>
+        <span>Notifications Hub</span>
+      </button>
+      <button onclick="switchTab('settings')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+        <span>Corporate Settings</span>
+      </button>
+      <button onclick="switchTab('reports')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 transition text-left cursor-pointer">
+        <i data-lucide="download-cloud" class="w-4 h-4 text-blue-600"></i>
+        <span class="font-bold text-slate-800">Reports & Exports</span>
+      </button>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t border-slate-100">
+      <button onclick="handleLogout()" class="w-full py-2 bg-slate-50 hover:bg-red-50 hover:text-red-600 text-slate-500 font-bold text-xs rounded-lg border border-slate-200 transition flex items-center justify-center gap-2 cursor-pointer">
+        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div id="main-workspace" class="flex-grow flex flex-col min-w-0 md:ml-64 h-full overflow-hidden">
+    <!-- Navbar -->
+    <header class="h-16 border-b border-slate-200 bg-white/80 backdrop-blur px-4 flex items-center justify-between sticky top-0 z-30">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="text-slate-500 hover:text-slate-800 hover:bg-slate-100 p-1.5 rounded-lg cursor-pointer transition">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="text-blue-600 font-bold">Admin Portal</span>
+          <span class="text-slate-400">/</span>
+          <span id="breadcrumb-title" class="text-slate-600 capitalize">Dashboard</span>
+        </div>
+      </div>
+
+      <!-- Language Selector Dropdown -->
+      <div id="lang-dropdown-container" class="relative z-40">
+        <button type="button" onclick="window.I18N.toggleDropdown()" class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition cursor-pointer shadow-sm">
+          <i data-lucide="languages" class="w-4 h-4 text-blue-600"></i>
+          <span id="selected-lang-label" class="hidden sm:inline">English</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+        </button>
+        <div id="lang-dropdown-menu" class="origin-top-right absolute right-0 mt-1.5 w-32 rounded-md shadow-lg bg-white border border-slate-200 focus:outline-none hidden z-50">
+          <div class="py-1">
+            <button onclick="window.I18N.setLanguage('en'); window.I18N.toggleDropdown()" class="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-bold flex items-center gap-1.5 cursor-pointer">
+              <span>English</span>
+            </button>
+            <button onclick="window.I18N.setLanguage('hi'); window.I18N.toggleDropdown()" class="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-bold flex items-center gap-1.5 cursor-pointer">
+              <span>हिंदी (Hindi)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scroll Workspace container -->
+    <main class="flex-grow p-4 sm:p-6 overflow-y-auto relative">
+      
+      <!-- Panel 1: Dashboard -->
+      <section id="panel-dashboard" class="panel space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white border border-slate-200 shadow-sm p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Total Catalog Products</span>
+              <span class="text-2xl font-black text-slate-800 font-mono animate-fade-in" id="stat-products-count">0</span>
+            </div>
+            <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+              <i data-lucide="package" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="bg-white border border-slate-200 shadow-sm p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Pending Claims</span>
+              <span class="text-2xl font-black text-blue-600 font-mono" id="stat-claims-pending">0</span>
+            </div>
+            <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+              <i data-lucide="file-clock" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="bg-white border border-slate-200 shadow-sm p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Registered Partners</span>
+              <span class="text-2xl font-black text-indigo-600 font-mono" id="stat-partners-count">0</span>
+            </div>
+            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+              <i data-lucide="users" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="bg-white border border-slate-200 shadow-sm p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Verified Scans History</span>
+              <span class="text-2xl font-black text-emerald-600 font-mono" id="stat-scans-completed">0</span>
+            </div>
+            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+              <i data-lucide="check-circle" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick operational lists -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-3.5">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2">Pending Redemption Requests</h3>
+            <div class="overflow-x-auto text-xs">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100">
+                    <th class="py-2">Member</th>
+                    <th class="py-2">Reward</th>
+                    <th class="py-2 text-right">Points</th>
+                  </tr>
+                </thead>
+                <tbody id="quick-redemptions-tbody" class="divide-y divide-slate-100 text-slate-700">
+                  <tr>
+                    <td colspan="3" class="py-4 text-center text-slate-400 font-mono">No pending redemptions.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-3.5">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2">Incoming Purchase Point Scans</h3>
+            <div class="overflow-x-auto text-xs">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100">
+                    <th class="py-2">Member</th>
+                    <th class="py-2">Product</th>
+                    <th class="py-2 text-right">Points</th>
+                  </tr>
+                </thead>
+                <tbody id="quick-claims-tbody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                  <tr>
+                    <td colspan="3" class="py-4 text-center text-slate-400 font-mono">No pending claims.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 2: User Management -->
+      <section id="panel-users" class="panel space-y-6 hidden">
+        <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm">Staff Operations Roster</h3>
+              <p class="text-xs text-slate-400">Search members, suspend profiles, or reset login passwords.</p>
+            </div>
+            <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <input type="text" id="user-search" oninput="handleUserSearch(this.value)" placeholder="Search Name, Firm, Mobile..."
+                class="w-full sm:w-64 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition">
+              <button onclick="openAddUserModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition cursor-pointer flex items-center justify-center gap-1 shadow-sm">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                <span>Register User</span>
+              </button>
+              <button onclick="openUserActivityLogModal()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition cursor-pointer flex items-center justify-center gap-1 border border-slate-200">
+                <i data-lucide="scroll" class="w-3.5 h-3.5"></i>
+                <span>Activity Log</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bulk actions menu -->
+          <div id="users-bulk-actions" class="hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-xs animate-fade-in">
+            <span class="font-bold text-indigo-800" id="users-selected-count">0 users selected</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="applyUsersBulkAction('approve')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded text-[10px] cursor-pointer flex items-center gap-1">
+                <i data-lucide="check-check" class="w-3 h-3"></i> Approve Selected
+              </button>
+              <button onclick="applyUsersBulkAction('suspend')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-black rounded text-[10px] cursor-pointer flex items-center gap-1">
+                <i data-lucide="ban" class="w-3 h-3"></i> Suspend Selected
+              </button>
+              <button onclick="applyUsersBulkAction('activate')" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-black rounded text-[10px] cursor-pointer flex items-center gap-1">
+                <i data-lucide="power" class="w-3 h-3"></i> Activate Selected
+              </button>
+              <button onclick="applyUsersBulkAction('delete')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-black rounded text-[10px] cursor-pointer flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3 h-3"></i> Delete Selected
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto text-xs">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100">
+                  <th class="py-3 w-8">
+                    <input type="checkbox" id="users-select-all" onchange="toggleSelectAllUsers(this.checked)" class="rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                  </th>
+                  <th class="py-3">Member Info</th>
+                  <th class="py-3">Type</th>
+                  <th class="py-3">Firm Name</th>
+                  <th class="py-3">Contact</th>
+                  <th class="py-3">Status</th>
+                  <th class="py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                <tr>
+                  <td colspan="7" class="py-6 text-center text-slate-400 font-mono">Fetching members roster...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 3: Product Catalog Management -->
+      <section id="panel-products" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Add / Edit Product form -->
+          <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4 h-fit">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 id="product-form-title" class="font-bold text-slate-800 text-sm">Add New Catalog Product</h3>
+              <button onclick="resetProductForm()" id="btn-cancel-edit" class="text-slate-400 hover:text-slate-600 text-xs hidden cursor-pointer">Cancel</button>
+            </div>
+            <form onsubmit="handleProductFormSubmit(event)" class="space-y-3 text-xs">
+              <input type="hidden" id="prod-id">
+              <div>
+                <label class="block font-bold text-slate-500 mb-1">Product Name</label>
+                <input type="text" id="prod-name" required placeholder="Brake Pad Reinforced 16 inch"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Brand</label>
+                  <input type="text" id="prod-brand" required placeholder="Vikas Premium"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Category</label>
+                  <input type="text" id="prod-category" required placeholder="Brakes"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Item Code <span class="text-[9px] text-slate-400">(Auto-gen if empty)</span></label>
+                  <input type="text" id="prod-itemcode" placeholder="HP-0001"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Distributor Price (₹)</label>
+                  <input type="number" id="prod-distprice" required placeholder="800"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">MRP (₹)</label>
+                  <input type="number" id="prod-mrp" required placeholder="1250"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Pack Size</label>
+                  <input type="text" id="prod-pack" required placeholder="1 Unit"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Retailer Price (₹)</label>
+                  <input type="number" id="prod-retprice" required placeholder="950"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Mechanic Price (₹)</label>
+                  <input type="number" id="prod-mechprice" required placeholder="1100"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Retailer Points</label>
+                  <input type="number" id="prod-retpoints" required placeholder="100"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Mechanic Points</label>
+                  <input type="number" id="prod-mechpoints" required placeholder="150"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Product Status</label>
+                  <select id="prod-status" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Custom QR Code Text</label>
+                  <input type="text" id="prod-qrcode" placeholder="STICKER-HP-0001"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-500 mb-1">Created Date</label>
+                <input type="date" id="prod-created"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+              </div>
+              <button type="submit" id="prod-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition cursor-pointer">
+                Save Product Card
+              </button>
+            </form>
+
+            <div class="pt-4 border-t border-slate-100 text-center">
+              <label class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 text-xs text-slate-700 font-bold rounded-lg transition cursor-pointer">
+                <i data-lucide="upload-cloud" class="w-4 h-4 text-blue-600"></i>
+                <span>Bulk Upload Catalog CSV</span>
+                <input type="file" accept=".csv" class="hidden" onchange="handleBulkProductUpload(this)">
+              </label>
+            </div>
+          </div>
+
+          <!-- Existing products table -->
+          <div class="lg:col-span-2 bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <h3 class="font-bold text-slate-800 text-sm">Complete Spare Parts Catalog</h3>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="handleDownloadSelectedQRs()" id="btn-download-selected-qr" disabled 
+                  class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-[11px] rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+                  <span>Download QR (Selected)</span>
+                </button>
+                <button onclick="handleDownloadAllQRs()" id="btn-download-all-qr" 
+                  class="px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 hover:border-indigo-300 font-bold text-[11px] rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>Download QR (All)</span>
+                </button>
+                <button onclick="handleDeleteSelectedProducts()" id="btn-delete-selected" disabled 
+                  class="px-3 py-1.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-[11px] rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  <span>Delete Selected</span>
+                </button>
+                <button onclick="handleDeleteAllProducts()" id="btn-delete-all" 
+                  class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                  <span>Delete All Products</span>
+                </button>
+              </div>
+            </div>
+            <div class="overflow-x-auto text-xs">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100">
+                    <th class="py-2.5 pl-2 w-10">
+                      <input type="checkbox" id="select-all-products" onchange="toggleSelectAllProducts(this)" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    </th>
+                    <th class="py-2.5">Item Code</th>
+                    <th class="py-2.5">Product Name</th>
+                    <th class="py-2.5">Pack & Category</th>
+                    <th class="py-2.5">Prices (R &bull; M &bull; D)</th>
+                    <th class="py-2.5">Loyalty Pts</th>
+                    <th class="py-2.5">Status</th>
+                    <th class="py-2.5">Created Date</th>
+                    <th class="py-2.5 text-right pr-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="products-tbody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                  <tr>
+                    <td colspan="9" class="py-6 text-center text-slate-400 font-mono">Fetching catalog...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 5: Purchase Requests scan validation -->
+      <section id="panel-purchases" class="panel space-y-6 hidden">
+        <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm">QR Code Scan Claim Validation</h3>
+              <p class="text-xs text-slate-400">Authorize points requests scanned by Retailers or Mechanics.</p>
+            </div>
+          </div>
+
+          <!-- Claims Bulk actions menu -->
+          <div id="claims-bulk-actions" class="hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-xs animate-fade-in">
+            <span class="font-bold text-indigo-800" id="claims-selected-count">0 claims selected</span>
+            <div class="flex items-center gap-2">
+              <button onclick="applyClaimsBulkAction('approve')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded text-[10px] cursor-pointer flex items-center gap-1">
+                <i data-lucide="check-check" class="w-3 h-3"></i> Approve Selected
+              </button>
+              <button onclick="applyClaimsBulkAction('reject')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-black rounded text-[10px] cursor-pointer flex items-center gap-1">
+                <i data-lucide="x-circle" class="w-3 h-3"></i> Reject Selected
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto text-xs">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100">
+                  <th class="py-3 w-8">
+                    <input type="checkbox" id="claims-select-all" onchange="toggleSelectAllClaims(this.checked)" class="rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                  </th>
+                  <th class="py-3">Claimant Details</th>
+                  <th class="py-3">Spare Part Product</th>
+                  <th class="py-3">Scanned Qty</th>
+                  <th class="py-3">Calculated points</th>
+                  <th class="py-3">Status</th>
+                  <th class="py-3">Scan Date</th>
+                  <th class="py-3 text-right">Approve / Reject</th>
+                </tr>
+              </thead>
+              <tbody id="purchases-tbody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                <tr>
+                  <td colspan="8" class="py-6 text-center text-slate-400 font-mono">Fetching scanned claims ledger...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 6: QR Management / Generation -->
+      <section id="panel-qr-codes" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Selection & specs -->
+          <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4 h-fit">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">QR Barcode Generator</h3>
+            <div class="space-y-3 text-xs">
+              <div>
+                <label class="block font-bold text-slate-500 mb-1">Select Product to encode</label>
+                <select id="qr-select-product" onchange="loadProductQrMetadata()"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                  <option value="">-- Choose Product --</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-500 mb-1">Product Name</label>
+                <input type="text" id="qr-name" placeholder="Product Name"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Batch Number</label>
+                  <input type="text" id="qr-batch" value="B-2026-07"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Pack Size</label>
+                  <input type="text" id="qr-pack" value="1 Unit"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Quantity (Qty)</label>
+                  <input type="number" id="qr-qty" value="1" min="1"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-500 mb-1">Manufacturing Date</label>
+                  <input type="date" id="qr-mfg-date" value="2026-07-03"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-500 mb-1">Sticker Format</label>
+                <select id="sticker-template-select" onchange="handleStickerTemplateChange(this.value)"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                  <option value="classic">Classic Black</option>
+                  <option value="modern">Modern Blue</option>
+                  <option value="premium">Premium Gold</option>
+                </select>
+              </div>
+              <button onclick="generateProductQrGraphic()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/10 cursor-pointer">
+                <i data-lucide="qr-code" class="w-4 h-4"></i>
+                <span>Generate Point Sticker</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic QR code display panel -->
+          <div class="md:col-span-2 bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Sticker Label Sticker Preview</h3>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-8 py-6">
+              <!-- Render sticker card -->
+              <div id="sticker-label" class="w-64 bg-white text-slate-900 p-4 rounded-lg shadow-xl space-y-3 border border-slate-300 font-sans hidden">
+                <div class="flex items-center justify-between border-b-2 border-slate-900 pb-1">
+                  <span class="font-black text-xs tracking-tight uppercase">VIKAS AUTO GENUINE</span>
+                  <span class="text-[8px] font-mono font-bold bg-slate-900 text-white px-1 rounded" id="label-prod-id">P-001</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div id="qr-canvas-container" class="p-1 bg-white border border-slate-400 rounded">
+                    <!-- Target for qrcode-generator -->
+                  </div>
+                  <div class="min-w-0 flex-grow text-[9px] font-mono leading-tight space-y-0.5">
+                    <p class="font-bold truncate" id="label-prod-name">Part Name</p>
+                    <p id="label-brand">Brand: -</p>
+                    <p id="label-batch">Batch: -</p>
+                    <p id="label-pack">Size: -</p>
+                    <p id="label-qty">Qty: -</p>
+                    <p id="label-mfg">MFG: -</p>
+                  </div>
+                </div>
+                <div class="text-[8px] font-mono text-center text-slate-500 border-t border-slate-200 pt-1.5">
+                  SCAN VIA APP TO ACCUMULATE LOYALTY POINTS
+                </div>
+              </div>
+
+              <!-- empty state -->
+              <div id="qr-empty-state" class="text-center py-12 text-slate-400 font-mono text-xs space-y-2">
+                <i data-lucide="qr-code" class="w-12 h-12 mx-auto text-slate-300 animate-pulse"></i>
+                <p>Configure and generate loyalty sticker preview.</p>
+              </div>
+
+              <div id="qr-actions-panel" class="hidden flex-col gap-2">
+                <button onclick="downloadQrSticker()" class="px-4 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                  <i data-lucide="download" class="w-4 h-4 text-blue-600"></i>
+                  <span>Download Sticker JPG</span>
+                </button>
+                <button onclick="printQrSticker()" class="px-4 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                  <i data-lucide="printer" class="w-4 h-4 text-blue-600"></i>
+                  <span>Print Parts Label</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 6B: QR Code Claim Validation Management -->
+      <section id="panel-qr-claims" class="panel space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">QR Code Claim Validation Management</h2>
+            <p class="text-xs text-slate-500 font-medium">Verify sticker genuineness, review claims, and prevent double-redemptions.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="loadQrClaims()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span>Refresh Claims</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="relative col-span-1 md:col-span-2">
+            <label class="block font-bold text-slate-400 text-[10px] uppercase font-mono mb-1">Search Claims</label>
+            <div class="relative">
+              <input type="text" id="qr-claim-search" oninput="handleQrClaimsSearch()" placeholder="Search Claim ID, Item Code, User, QR..."
+                class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-850 focus:outline-none focus:border-blue-500">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+            </div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-400 text-[10px] uppercase font-mono mb-1">Claim Status</label>
+            <select id="qr-claim-filter-status" onchange="handleQrClaimsSearch()"
+              class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-850 focus:outline-none focus:border-blue-500">
+              <option value="all">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Duplicate">Duplicate</option>
+              <option value="Invalid QR">Invalid QR</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-400 text-[10px] uppercase font-mono mb-1">User Role</label>
+            <select id="qr-claim-filter-role" onchange="handleQrClaimsSearch()"
+              class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-850 focus:outline-none focus:border-blue-500">
+              <option value="all">All Roles</option>
+              <option value="retailer">Retailer</option>
+              <option value="mechanic">Mechanic</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center text-[11px] text-slate-500 font-mono">
+          <div>
+            * Pending claims require evaluation diagnosis before approval.
+          </div>
+          <div>
+            Showing: <span id="qr-claims-count" class="font-bold text-blue-600">0</span> claims
+          </div>
+        </div>
+
+        <!-- Claims Table Card -->
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <div class="overflow-x-auto text-xs">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100 bg-slate-50">
+                  <th class="py-2.5 pl-4">Claim ID</th>
+                  <th class="py-2.5">QR Code / Item Code</th>
+                  <th class="py-2.5">Product Name</th>
+                  <th class="py-2.5">User Details</th>
+                  <th class="py-2.5">Claim Date</th>
+                  <th class="py-2.5">Status</th>
+                  <th class="py-2.5">Remarks</th>
+                  <th class="py-2.5 text-right pr-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="qr-claims-tbody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                <tr>
+                  <td colspan="8" class="py-8 text-center text-slate-400 font-mono">Fetching claims list...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- QR Claim Action/Edit Modal -->
+      <div id="qr-claim-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-slate-200 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-fade-in text-xs">
+          <!-- Header -->
+          <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+              </span>
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm">QR Claim Evaluation Diagnosis</h3>
+                <p class="text-[10px] text-slate-500 font-mono" id="modal-claim-id">Claim ID: -</p>
+              </div>
+            </div>
+            <button onclick="closeQrClaimModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <!-- Body -->
+          <div class="p-5 space-y-4">
+            <!-- Diagnosis Warning Boxes -->
+            <div id="modal-diagnosis-alert" class="p-3.5 rounded-lg border flex gap-2">
+              <!-- Filled dynamically by js -->
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <span class="block text-slate-400 text-[10px] uppercase font-mono font-bold">QR Scanned Code</span>
+                <span id="modal-qr-code" class="text-xs text-slate-800 font-mono font-bold">-</span>
+              </div>
+              <div>
+                <span class="block text-slate-400 text-[10px] uppercase font-mono font-bold">Item Code Match</span>
+                <span id="modal-item-code" class="text-xs text-slate-800 font-mono font-bold">-</span>
+              </div>
+            </div>
+
+            <div>
+              <span class="block text-slate-400 text-[10px] uppercase font-mono font-bold">Product Name</span>
+              <span id="modal-prod-name" class="text-xs font-bold text-slate-800">-</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <span class="block text-slate-400 text-[10px] uppercase font-mono font-bold">User Submitting</span>
+                <span id="modal-user-name" class="text-xs font-semibold text-slate-800">-</span>
+              </div>
+              <div>
+                <span class="block text-slate-400 text-[10px] uppercase font-mono font-bold">User Role</span>
+                <span id="modal-user-role" class="text-xs font-semibold text-slate-800 uppercase font-mono text-slate-500">-</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-500 mb-1">Status Action</label>
+              <select id="modal-status-select" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                <option value="Pending">Pending Evaluation</option>
+                <option value="Approved">Approve Claim (Award Loyalty Points)</option>
+                <option value="Rejected">Reject Claim</option>
+                <option value="Duplicate">Mark as Duplicate Claim</option>
+                <option value="Invalid QR">Mark as Invalid QR</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-500 mb-1">Audit Remarks / Notes</label>
+              <textarea id="modal-remarks" rows="2" placeholder="e.g. Verified genuine hologram stickers on packing box."
+                class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500"></textarea>
+            </div>
+          </div>
+          <!-- Footer -->
+          <div class="bg-slate-50 px-5 py-3 border-t border-slate-100 flex items-center justify-end gap-2">
+            <button onclick="closeQrClaimModal()" class="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 cursor-pointer">
+              Cancel
+            </button>
+            <button id="modal-save-btn" onclick="saveQrClaimEvaluation()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg cursor-pointer">
+              Confirm & Save
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 6C: Corporate Settings Module -->
+      <section id="panel-settings" class="panel space-y-6 hidden">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Corporate Settings & Policy Management</h2>
+          <p class="text-xs text-slate-500 font-medium">Configure global point multipliers, tier status rules, and reward limits.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Policy Form Card -->
+          <form id="settings-policy-form" onsubmit="handleSaveSettingsSubmit(event)" class="md:col-span-2 bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-6 text-xs">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3 flex items-center gap-1.5">
+              <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
+              <span>Global Loyalty Policies</span>
+            </h3>
+
+            <!-- Multipliers -->
+            <div class="space-y-4">
+              <h4 class="font-bold text-slate-400 text-[10px] uppercase font-mono tracking-wider">Points Multipliers</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1" for="settings-retailer-multiplier">Retailer Multiplier</label>
+                  <div class="relative">
+                    <input type="number" id="settings-retailer-multiplier" step="0.1" min="0.1" required
+                      class="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-blue-500">
+                    <span class="absolute right-3 top-2.5 text-slate-400 font-bold">x</span>
+                  </div>
+                  <span class="text-[10px] text-slate-400 mt-1 block">Baseline multiplier for retailer scan claims.</span>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1" for="settings-mechanic-multiplier">Mechanic Multiplier</label>
+                  <div class="relative">
+                    <input type="number" id="settings-mechanic-multiplier" step="0.1" min="0.1" required
+                      class="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-blue-500">
+                    <span class="absolute right-3 top-2.5 text-slate-400 font-bold">x</span>
+                  </div>
+                  <span class="text-[10px] text-slate-400 mt-1 block">Baseline multiplier for mechanic scan claims.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tier Thresholds -->
+            <div class="space-y-4">
+              <h4 class="font-bold text-slate-400 text-[10px] uppercase font-mono tracking-wider">Elite Member Milestones (Wallet Pts)</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1" for="settings-silver-threshold">Silver Tier Threshold</label>
+                  <div class="relative">
+                    <input type="number" id="settings-silver-threshold" min="0" required
+                      class="w-full pl-3 pr-12 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-blue-500">
+                    <span class="absolute right-3 top-2.5 text-slate-400 font-bold">Pts</span>
+                  </div>
+                  <span class="text-[10px] text-slate-400 mt-1 block">Required wallet balance to unlock Silver badge.</span>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1" for="settings-gold-threshold">Gold Tier Threshold</label>
+                  <div class="relative">
+                    <input type="number" id="settings-gold-threshold" min="0" required
+                      class="w-full pl-3 pr-12 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-blue-500">
+                    <span class="absolute right-3 top-2.5 text-slate-400 font-bold">Pts</span>
+                  </div>
+                  <span class="text-[10px] text-slate-400 mt-1 block">Required wallet balance to unlock Gold badge.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-4 flex justify-end">
+              <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg cursor-pointer transition flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Save Policy Changes</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- System Overview Info Card -->
+          <div class="space-y-6">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 text-xs space-y-3.5">
+              <h3 class="font-bold text-blue-900 text-sm flex items-center gap-1.5">
+                <i data-lucide="info" class="w-4.5 h-4.5 text-blue-600"></i>
+                <span>Policy Integration</span>
+              </h3>
+              <p class="text-slate-600 leading-relaxed font-medium">
+                Changing point multipliers directly affects future scan claims. Newly submitted claims from Retailers or Mechanics will automatically inherit these revised values during the loyalty award calculation process.
+              </p>
+              <div class="p-3 bg-white/60 rounded-lg space-y-2 border border-blue-50/50">
+                <div class="flex justify-between font-mono text-[10px]">
+                  <span class="text-slate-400">Database Engine:</span>
+                  <span class="font-bold text-slate-700">Google Sheets API</span>
+                </div>
+                <div class="flex justify-between font-mono text-[10px]">
+                  <span class="text-slate-400">Offline Sync:</span>
+                  <span class="font-bold text-emerald-600">Active (Automatic)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+       <!-- Panel 7: Rewards Catalogue & Redemptions -->
+      <section id="panel-rewards" class="panel space-y-6 hidden animate-fade-in">
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div>
+            <h3 class="font-black text-slate-800 text-sm">Loyalty Gift Rewards Catalogue</h3>
+            <p class="text-xs text-slate-400">Add rewards, update stock, upload images, and process member redemption requests.</p>
+          </div>
+          <button onclick="openAddRewardModal()" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs transition cursor-pointer flex items-center gap-1 shadow-sm shrink-0">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+            <span>Add New Reward</span>
+          </button>
+        </div>
+
+        <!-- Redemption Approvals Queue -->
+        <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs">Redemption Requests Queue</h4>
+              <p class="text-[10px] text-slate-400">Validate member points balance, deduct reward item stock, and issue payout codes.</p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto text-xs">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-slate-400 font-mono text-[9px] uppercase border-b border-slate-100">
+                  <th class="py-2">Member</th>
+                  <th class="py-2">Selected Reward</th>
+                  <th class="py-2">Points Cost</th>
+                  <th class="py-2">Reward Stock</th>
+                  <th class="py-2">Status</th>
+                  <th class="py-2 text-right">Verification Verdict</th>
+                </tr>
+              </thead>
+              <tbody id="admin-redemptions-tbody" class="divide-y divide-slate-100 text-slate-700">
+                <tr>
+                  <td colspan="6" class="py-6 text-center text-slate-400 font-mono">No pending redemptions in queue.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Catalogue Grid -->
+        <div class="space-y-3">
+          <h4 class="font-bold text-slate-800 text-xs pl-1">Live Catalogue Inventory</h4>
+          <div id="admin-rewards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <!-- Populated dynamically -->
+            <div class="col-span-full py-8 text-center text-slate-400 font-mono">Loading dynamic rewards...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 8: Notifications hub -->
+      <section id="panel-notifs" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Compose Partner Announcement</h3>
+            <form onsubmit="handleSendAnnouncementSubmit(event)" class="space-y-4 text-xs">
+              <div>
+                <label class="block font-bold text-slate-500 mb-1" for="notif-target">Target Members</label>
+                <select id="notif-target" required
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                  <option value="all">All Members (Retailers & Mechanics)</option>
+                  <option value="retailer">Retailers Only</option>
+                  <option value="mechanic">Mechanics Only</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-500 mb-1" for="notif-channel">Delivery Channel</label>
+                <select id="notif-channel" required
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+                  <option value="all">Unified Delivery (WhatsApp + Email + Dashboard)</option>
+                  <option value="whatsapp">WhatsApp Direct API Only</option>
+                  <option value="email">Corporate Support Email SMTP Only</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-500 mb-1" for="notif-subject">Subject Header</label>
+                <input type="text" id="notif-subject" required placeholder="Monsoon Spare Parts Bonus Scheme 2026"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-500 mb-1" for="notif-body">Notification Message Body</label>
+                <textarea id="notif-body" required rows="4" placeholder="Get 1.5x points multiplier on all brake parts during July..."
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500 resize-none"></textarea>
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition shadow-lg shadow-blue-500/10 flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="send" class="w-4 h-4"></i>
+                <span>Broadcast Announcement</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- History of broadcasts -->
+          <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Dispatched Bulletins Logs</h3>
+            <div class="space-y-3 max-h-[400px] overflow-y-auto" id="broadcasts-feed">
+              <p class="text-xs text-slate-400 font-mono text-center py-12">No recent announcements dispatched.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen: Reports & Corporate Ledgers Hub -->
+      <section id="panel-reports" class="panel space-y-6 hidden">
+        <div class="bg-gradient-to-r from-slate-900 to-slate-950 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <h2 class="text-xl font-bold tracking-tight">Reports & Corporate Ledgers Hub</h2>
+            <p class="text-xs text-slate-300 max-w-2xl font-medium">
+              Secure administrative center for downloading structured registries, active ledgers, logs, and financial records. All files are exported as industry-standard UTF-8 encoded, Excel-compatible CSV sheets.
+            </p>
+          </div>
+          <div class="shrink-0">
+            <span class="px-3 py-1.5 bg-blue-500/20 text-blue-300 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full border border-blue-400/20">
+              Admin Exporter Active
+            </span>
+          </div>
+        </div>
+
+        <!-- Major Corporate Sales Data Block -->
+        <div class="bg-gradient-to-br from-emerald-50 to-teal-50/45 border border-emerald-100 shadow-sm rounded-2xl p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <h3 class="font-extrabold text-emerald-950 text-sm tracking-tight uppercase">Master Sales & Revenue Statement</h3>
+            </div>
+            <p class="text-xs text-slate-600 max-w-3xl">
+              Contains aggregated transactions of physical scans and invoices, calculated unit pricing, points distributed, customer business metrics, and approval timestamps. Essential for tax audits and supply-chain reconciliation.
+            </p>
+          </div>
+          <button onclick="window.EXPORTER.exportCombinedSalesReport()" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-slate-950 font-black text-xs uppercase rounded-xl transition flex items-center gap-2 shadow-sm cursor-pointer whitespace-nowrap">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-slate-950"></i>
+            <span>Download Master Sales Excel</span>
+          </button>
+        </div>
+
+        <!-- 8 Detailed Registries & Ledgers Bento Grid -->
+        <div class="space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Granular Database Tables & Logs</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            
+            <!-- Table 1: Registration Data -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">1. Registration Data Registry</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Full list of retailers and mechanics with user ID, name, email, firm name, mobile, points balances, approval statuses, and registration timestamps.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportRegistrationData()" class="w-full py-2 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-blue-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Registration Data</span>
+              </button>
+            </div>
+
+            <!-- Table 2: Product Catalog -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+                    <i data-lucide="package" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">2. Product Details Catalog</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Product master table including product ID, catalog name, pack size, barcode QR codes, dealer prices, and tier-specific point multiplier configurations.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportProductDetails()" class="w-full py-2 bg-slate-50 hover:bg-purple-50 hover:text-purple-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-purple-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Product Details</span>
+              </button>
+            </div>
+
+            <!-- Table 3: Purchase Requests -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
+                    <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">3. Purchase Requests Ledger</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Chronological records of all submitted point scan claims. Tracks user IDs, scan dates, quantities, estimated amounts, and pending/approved/rejected states.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportPurchaseRequests()" class="w-full py-2 bg-slate-50 hover:bg-amber-50 hover:text-amber-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-amber-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Purchase Requests</span>
+              </button>
+            </div>
+
+            <!-- Table 4: Purchase History -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">4. Purchase History Log</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Secure record of approved transactions. Includes Purchase IDs, verified points awarded, authorized billing amounts, and audit signatures of the approving agent.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportPurchaseHistory()" class="w-full py-2 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-emerald-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Purchase History</span>
+              </button>
+            </div>
+
+            <!-- Table 5: Points Ledger -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-rose-50 text-rose-600 rounded-lg">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">5. Points Ledger Statements</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Comprehensive audit ledger mapping point credit scans, point debit redemptions, running point balances for every user, and official validation remarks.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportPointsLedger()" class="w-full py-2 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-rose-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Points Ledger</span>
+              </button>
+            </div>
+
+            <!-- Table 6: Admin Users Data -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">6. Admin Users Directory</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Organizational list of systems administrators and executive owners. Contains email, password, mobile, approval role, and active status indicators.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportAdminUsersData()" class="w-full py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-indigo-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Admin Users Data</span>
+              </button>
+            </div>
+
+            <!-- Table 7: OTP Logs -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-orange-50 text-orange-600 rounded-lg">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">7. OTP Authentication Logs</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Security logs of 2FA OTP codes issued to users during logins. Tracks generation timestamps, code values, validation outcomes, and usage timestamps.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportOtpLogs()" class="w-full py-2 bg-slate-50 hover:bg-orange-50 hover:text-orange-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-orange-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export OTP Logs</span>
+              </button>
+            </div>
+
+            <!-- Table 8: System Logs -->
+            <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
+              <div class="space-y-1.5 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-slate-100 text-slate-700 rounded-lg">
+                    <i data-lucide="terminal" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="font-bold text-slate-800 text-xs">8. System Activity Logs</h4>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Low-level system activity records: timestamps, user profiles, actions (e.g. login, scan, catalog change), functional modules, and remarks.
+                </p>
+              </div>
+              <button onclick="window.EXPORTER.exportSystemLogs()" class="w-full py-2 bg-slate-50 hover:bg-slate-100 hover:text-slate-800 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-slate-400 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export System Logs</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Google Sheets Cloud Synchronization -->
+        <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4 mt-6">
+          <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Google Drive Cloud Synchronization</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Configure real-time bidirectional synchronization with your Google Sheet to mirror databases and trigger backup files directly to Google Drive.
+          </p>
+          <div id="google-sheets-sync-container"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Reset Password Modal dialog -->
+  <div id="reset-password-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-sm bg-white border border-slate-200 rounded-xl p-6 shadow-2xl relative space-y-4">
+      <button onclick="closeResetPasswordModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+          <i data-lucide="key" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-800 text-sm">Force Password Reset</h3>
+          <p class="text-[11px] text-slate-400" id="reset-modal-subtitle">Resetting for user...</p>
+        </div>
+      </div>
+      <form onsubmit="handleForceResetPasswordSubmit(event)" class="space-y-4 pt-1 text-xs">
+        <input type="hidden" id="reset-user-email">
+        <div>
+          <label class="block font-bold text-slate-500 mb-1">New Secure Password</label>
+          <input type="password" id="reset-new-pass" required placeholder="••••••••" minlength="6"
+            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500">
+        </div>
+        <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition shadow-lg shadow-blue-500/10 cursor-pointer">
+          Confirm Passphrase Change
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Member Loyalty QR Code Modal -->
+  <div id="loyalty-qr-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-hidden">
+      <!-- Close Button -->
+      <button onclick="closeLoyaltyQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Title -->
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+          <i data-lucide="qr-code" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-slate-800 text-sm tracking-tight">Loyalty Member Card</h3>
+          <p class="text-[10px] text-slate-400">Generate, print or download unique identity QR code.</p>
+        </div>
+      </div>
+
+      <!-- Pass format selector -->
+      <div>
+        <label class="block font-bold text-slate-500 text-xs mb-1">Pass Format</label>
+        <select id="pass-template-select" onchange="handlePassTemplateChange(this.value)"
+          class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 text-xs focus:outline-none focus:border-blue-500">
+          <option value="classic">Classic Navy</option>
+          <option value="modern">Modern Blue</option>
+          <option value="premium">Premium Gold</option>
+        </select>
+      </div>
+
+      <!-- Card Box for printing/saving -->
+      <div id="loyalty-card-container" class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col items-center justify-center">
+        <!-- The actual printable card -->
+        <div id="loyalty-printable-card" class="w-full bg-white text-slate-900 p-5 border border-slate-300 rounded-xl shadow-md flex flex-col justify-between font-sans select-none relative" style="aspect-ratio: 1.58 / 1;">
+          
+          <!-- Card Header -->
+          <div class="flex items-start justify-between border-b-2 border-slate-900 pb-2">
+            <div>
+              <h5 class="text-[12px] font-black uppercase tracking-tight text-slate-950">VIKAS AUTOMOBILES</h5>
+              <p class="text-[7.5px] font-mono font-black text-blue-600 tracking-wider">OFFICIAL PARTNER PASS</p>
+            </div>
+            <span id="qr-card-badge" class="px-2 py-0.5 bg-slate-950 text-white font-mono text-[7px] font-black uppercase rounded">RETAILER</span>
+          </div>
+
+          <!-- Card Body with QR and details -->
+          <div class="flex items-center gap-4 py-3">
+            <!-- QR Container -->
+            <div id="modal-qr-code-box" class="w-24 h-24 p-1.5 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
+              <!-- Dynamically rendered SVG QR code -->
+            </div>
+
+            <!-- Member details -->
+            <div class="flex-grow text-[9px] font-mono leading-tight space-y-1 text-slate-700">
+              <p class="font-extrabold text-slate-950 uppercase truncate" id="qr-card-name">Member Name</p>
+              <p class="truncate" id="qr-card-firm">Firm: Name of Shop</p>
+              <p class="truncate" id="qr-card-email">Email: name@email.com</p>
+              <p id="qr-card-phone">Phone: 9876543210</p>
+              <p id="qr-card-date" class="text-slate-400 font-normal">Issued: 01-Jan-2026</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="border-t border-dashed border-slate-300 pt-1.5 text-center text-[7px] text-slate-400 font-mono tracking-wider">
+            PRESENT CODE AT WAREHOUSE FOR INSTANT CASH-BACKS
+          </div>
+        </div>
+      </div>
+
+      <!-- Action panel -->
+      <div class="grid grid-cols-3 gap-2 pt-2">
+        <button onclick="downloadMemberQrCard()" class="py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+          <i data-lucide="download" class="w-4 h-4 text-blue-600"></i>
+          <span class="text-[10px]">Save PNG</span>
+        </button>
+        <button onclick="downloadMemberQrCardPdf()" class="py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+          <i data-lucide="file-text" class="w-4 h-4 text-emerald-600"></i>
+          <span class="text-[10px]">Save PDF</span>
+        </button>
+        <button onclick="printMemberQrCard()" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition flex flex-col items-center justify-center gap-1 cursor-pointer shadow-lg shadow-blue-500/10">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span class="text-[10px]">Print Pass</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Purchase Claims Custom Evaluation Modal (Light Theme) -->
+  <div id="purchase-claim-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-hidden">
+      <!-- Close Button -->
+      <button onclick="closePurchaseClaimModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Title -->
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+          <i data-lucide="file-check-2" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-slate-800 text-sm tracking-tight">Review Purchase Claim</h3>
+          <p class="text-[10px] text-slate-400" id="p-modal-claim-subtitle">Evaluate points reward request submitted by member.</p>
+        </div>
+      </div>
+
+      <!-- Claim Details Card -->
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-slate-400 font-mono">Claim ID:</span>
+          <span id="p-modal-id" class="font-bold text-slate-800 font-mono">CLM-0000</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400 font-mono">Member:</span>
+          <span id="p-modal-member" class="font-bold text-slate-800">John Doe</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400 font-mono">Product:</span>
+          <span id="p-modal-product" class="font-bold text-slate-800 text-right truncate max-w-[200px]">Break Pad</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400 font-mono">Quantity:</span>
+          <span id="p-modal-qty" class="font-bold text-slate-800 font-mono">1</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400 font-mono">Requested Points:</span>
+          <span id="p-modal-points" class="font-bold text-emerald-600 font-mono">0 pts</span>
+        </div>
+      </div>
+
+      <!-- Invoice/Bill Image Preview -->
+      <div class="space-y-1.5 text-xs">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Scanned Invoice Attachment</label>
+        <div class="border border-slate-200 rounded-xl p-2 bg-slate-50 relative overflow-hidden flex items-center justify-center h-28 group">
+          <img id="p-modal-invoice-preview" src="" alt="Invoice Attachment" class="h-full object-contain rounded transition group-hover:scale-105" onerror="this.src='https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=400'">
+          <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-[10px] text-white font-black uppercase tracking-wider gap-1 cursor-pointer" onclick="window.open(document.getElementById('p-modal-invoice-preview').src, '_blank')">
+            <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> Full Invoice Preview
+          </div>
+        </div>
+      </div>
+
+      <!-- Duplicate QR Warning Banner -->
+      <div id="p-modal-duplicate-warning" class="hidden p-2.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-[10px] font-bold flex items-start gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-rose-500 animate-pulse"></i>
+        <div>
+          <span>Duplicate QR/Invoice Scan Detected!</span>
+          <p class="font-normal text-rose-500 text-[9px] mt-0.5">This QR code string or receipt number matches an already approved claim in the ledger.</p>
+        </div>
+      </div>
+
+      <!-- Remarks History -->
+      <div class="space-y-1.5 text-xs">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Audit Remarks History</label>
+        <div id="p-modal-remarks-history" class="max-h-24 overflow-y-auto border border-slate-200 rounded-xl p-2.5 bg-slate-50 space-y-1.5">
+          <!-- Populated dynamically -->
+          <div class="text-[10px] text-slate-400 font-mono italic">No previous remarks in history.</div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form id="purchase-claim-form" onsubmit="savePurchaseClaimEvaluation(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="p-modal-claim-id">
+        
+        <!-- Decision selector -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Evaluation Verdict *</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="relative border border-slate-200 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
+              <input type="radio" name="p-modal-status" value="approved" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300">
+              <div class="text-left">
+                <p class="font-bold text-emerald-600">Approve</p>
+                <p class="text-[9px] text-slate-400">Award points instantly</p>
+              </div>
+            </label>
+            <label class="relative border border-slate-200 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
+              <input type="radio" name="p-modal-status" value="rejected" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300">
+              <div class="text-left">
+                <p class="font-bold text-rose-600">Reject</p>
+                <p class="text-[9px] text-slate-400">Decline & log reason</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Remarks -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1" for="p-modal-remark">Evaluation Remarks *</label>
+          <textarea id="p-modal-remark" required rows="3" placeholder="Verify bill image matching..."
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-blue-500"></textarea>
+          <p class="text-[9px] text-slate-400 mt-1">Please provide verification details or rejection reasons.</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+          <button type="button" onclick="closePurchaseClaimModal()"
+            class="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit"
+            class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg cursor-pointer">
+            Apply Decision
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Activity & Security Logs Modal (Light Theme) -->
+  <div id="user-activity-log-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-hidden">
+      <!-- Close Button -->
+      <button onclick="closeUserActivityLogModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Title -->
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+          <i data-lucide="scroll" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-slate-800 text-sm tracking-tight">Security & Activity Audit Trail</h3>
+          <p class="text-[10px] text-slate-400">Live operational events, user logons, claims approvals, and modifications.</p>
+        </div>
+      </div>
+
+      <!-- Live Search / Filter -->
+      <div class="flex items-center gap-2">
+        <input type="text" id="log-filter" oninput="filterActivityLogs(this.value)" placeholder="Filter logs by User, Tag, or Action Description..."
+          class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition">
+        <button onclick="window.EXPORTER.exportSystemLogs()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold rounded-lg text-xs transition cursor-pointer flex items-center gap-1 shrink-0">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
+        </button>
+      </div>
+
+      <!-- Logs List Scroll container -->
+      <div class="border border-slate-100 rounded-xl overflow-hidden text-xs">
+        <div class="bg-slate-50/50 px-3 py-2 border-b border-slate-100 grid grid-cols-12 gap-2 text-[9px] uppercase font-mono font-bold text-slate-400">
+          <span class="col-span-3">Timestamp</span>
+          <span class="col-span-3">Initiator / Role</span>
+          <span class="col-span-2">Tag</span>
+          <span class="col-span-4">Operation Description</span>
+        </div>
+        <div id="activity-logs-container" class="max-h-72 overflow-y-auto divide-y divide-slate-100 font-medium text-slate-700 bg-white">
+          <!-- Populated dynamically -->
+          <div class="p-4 text-center text-slate-400 font-mono italic">Loading audit trail logs...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register New User/Admin Modal (Light Theme) -->
+  <div id="add-user-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-hidden">
+      <!-- Close Button -->
+      <button onclick="closeAddUserModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Title -->
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+          <i data-lucide="user-plus" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-slate-800 text-sm tracking-tight">Admin User Registration</h3>
+          <p class="text-[10px] text-slate-400">Register a new administrator, staff user, retailer or mechanic.</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form id="add-user-form" onsubmit="handleRegisterNewUserSubmit(event)" class="space-y-4 text-xs">
+        <!-- Full name -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Name *</label>
+          <input type="text" id="add-user-name" required placeholder="John Doe"
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800">
+        </div>
+
+        <!-- Role select -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">User Role *</label>
+          <select id="add-user-role" required onchange="toggleAddUserFirmField()"
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-slate-50">
+            <option value="admin">Administrator (Admin)</option>
+            <option value="retailer">Retailer</option>
+            <option value="mechanic">Mechanic</option>
+          </select>
+        </div>
+
+        <!-- Email & Phone -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address *</label>
+            <input type="email" id="add-user-email" required placeholder="john@example.com"
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mobile No *</label>
+            <input type="text" id="add-user-phone" required placeholder="9876543210"
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800">
+          </div>
+        </div>
+
+        <!-- Firm Name -->
+        <div id="add-user-firm-group" class="hidden">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Firm Name</label>
+          <input type="text" id="add-user-firm" placeholder="Enter business name"
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800">
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Secure Password *</label>
+          <input type="password" id="add-user-password" required minlength="6" placeholder="••••••••"
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+          <button type="button" onclick="closeAddUserModal()"
+            class="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit"
+            class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg cursor-pointer">
+            Register User
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Partner Details Modal (Light Theme) -->
+  <div id="edit-partner-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-hidden">
+      <!-- Close Button -->
+      <button onclick="closeEditPartnerModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Title -->
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+          <i data-lucide="edit-3" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-slate-800 text-sm tracking-tight">Edit Partner Profile</h3>
+          <p class="text-[10px] text-slate-400">Modify registered details for retailer or mechanic partner.</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form id="edit-partner-form" onsubmit="savePartnerDetails(event)" class="space-y-4">
+        <input type="hidden" id="edit-partner-email-key">
+        
+        <!-- Profile Pic -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Profile Avatar URL</label>
+          <div class="flex items-center gap-4">
+            <img id="edit-partner-preview" src="" alt="Avatar" class="w-16 h-16 rounded-full object-cover border-2 border-blue-500/30">
+            <div class="flex-grow flex gap-2">
+              <input type="text" id="edit-partner-photo" class="flex-grow px-3 py-1.5 border border-slate-200 rounded-lg text-xs" placeholder="Image URL">
+              <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition border border-slate-200 flex items-center gap-1 cursor-pointer">
+                <i data-lucide="upload" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span>Upload</span>
+                <input type="file" accept="image/*" class="hidden" onchange="uploadPartnerPhotoFile(this)">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full name -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+          <input type="text" id="edit-partner-name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800">
+        </div>
+
+        <!-- Mobile No & email -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mobile No</label>
+            <input type="text" id="edit-partner-phone" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono text-slate-800">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email ID</label>
+            <input type="email" id="edit-partner-email" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs text-slate-800" readonly>
+          </div>
+        </div>
+
+        <!-- Firm / Workshop name -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Firm / Workshop Name</label>
+          <input type="text" id="edit-partner-firm" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800">
+        </div>
+
+        <!-- Address -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Address</label>
+          <textarea id="edit-partner-address" rows="2" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800"></textarea>
+        </div>
+
+        <!-- Wallet Points Adjustment -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Wallet Points</label>
+          <input type="number" id="edit-partner-points" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold text-blue-600">
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeEditPartnerModal()" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold text-xs rounded-lg transition cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg transition shadow-md shadow-blue-500/10 cursor-pointer">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add/Edit Reward Catalogue Item Modal (Light Theme) -->
+  <div id="add-reward-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-hidden">
+      <!-- Close Button -->
+      <button onclick="closeAddRewardModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Title -->
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+          <i data-lucide="gift" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-slate-800 text-sm tracking-tight" id="reward-modal-title">Add Catalogue Reward</h3>
+          <p class="text-[10px] text-slate-400">Configure points required, stock availability, and display images.</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form id="add-reward-form" onsubmit="handleRewardFormSubmit(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="reward-id">
+        
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Reward Item Name *</label>
+          <input type="text" id="reward-name" required placeholder="HP Premium Leather Wallet"
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 font-semibold focus:outline-none focus:border-purple-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Points Required *</label>
+            <input type="number" id="reward-points" required min="10" placeholder="500"
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 font-mono focus:outline-none focus:border-purple-500">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Stock Quantity *</label>
+            <input type="number" id="reward-stock" required min="0" placeholder="50"
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 font-mono focus:outline-none focus:border-purple-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Display Image URL</label>
+          <input type="url" id="reward-image" placeholder="https://images.unsplash.com/..."
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 font-mono focus:outline-none focus:border-purple-500">
+          <p class="text-[9px] text-slate-400 mt-1">Provide a standard image link or leave empty to use a premium default placeholder.</p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeAddRewardModal()" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold text-xs rounded-lg transition cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-lg transition shadow-md shadow-purple-500/10 cursor-pointer">
+            Save Reward
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast notification system -->
+  <div id="toast-root" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4 hidden">
+    <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+    <p class="text-xs text-slate-500 font-mono" id="loading-text">Synchronizing stock ledgers...</p>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/google-sheets-sync.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="js/admin.js"></script>
+  <script>
+    lucide.createIcons();
+    initAdminPage();
+    I18N.init();
+  </script>
+</body>
+</html>

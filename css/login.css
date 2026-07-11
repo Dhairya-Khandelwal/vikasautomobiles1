@@ -1,0 +1,27 @@
+/* Login and Registration Custom Layout Styles */
+
+.auth-card {
+  box-shadow: 0 20px 40px -15px rgba(0, 136, 255, 0.08);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+  border-color: rgba(0, 136, 255, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(0, 136, 255, 0.12);
+}
+
+.auth-logo-glow {
+  filter: drop-shadow(0 0 12px rgba(0, 136, 255, 0.25));
+}
+
+/* Step transition animations */
+.step-fade {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.step-hidden {
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  display: none;
+}

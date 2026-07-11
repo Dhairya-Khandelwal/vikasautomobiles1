@@ -1,0 +1,6 @@
+/* Responsive Layout Adjustments */
+@media (max-width: 768px) {
+  .drawer-active {
+    transform: translateX(0) !important;
+  }
+}

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Owner Dashboard - Vikas Automobiles</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for beautiful analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/owner.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="bg-[#0B192C] text-slate-100 min-h-full flex font-sans overflow-hidden">
+
+  <!-- Left Sidebar (Responsive Drawer) -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <!-- Sidebar Header -->
+    <div class="h-16 px-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="bg-[#FF6B00] text-[#0B192C] p-1.5 rounded-md">
+          <i data-lucide="wrench" class="w-5 h-5 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <span class="font-black text-sm tracking-tight text-white uppercase block leading-none">Vikas</span>
+          <span class="text-[9px] text-[#FF6B00] tracking-widest font-mono uppercase font-bold leading-none">Automobiles</span>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+        <i data-lucide="chevrons-left" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- User Profile Area -->
+    <div class="p-4 border-b border-slate-800 flex items-center gap-3 bg-slate-950/20">
+      <div class="relative">
+        <img id="sidebar-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop" alt="Profile" 
+          class="w-10 h-10 rounded-full object-cover border border-[#FF6B00]/40 referrerpolicy='no-referrer'">
+        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-900"></span>
+      </div>
+      <div class="min-w-0">
+        <span id="sidebar-username" class="font-bold text-white text-xs block truncate">Loading Owner...</span>
+        <span class="text-[9px] text-slate-500 font-mono uppercase tracking-wider block">Superuser Portal</span>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu Links -->
+    <nav class="flex-grow p-4 space-y-1 overflow-y-auto" id="sidebar-menu">
+      <button onclick="switchTab('dashboard')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-bold rounded-lg text-white bg-[#FF6B00] transition text-left">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span>Dashboard</span>
+      </button>
+      <button onclick="switchTab('approvals')" class="menu-item w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <div class="flex items-center gap-3">
+          <i data-lucide="user-check" class="w-4 h-4"></i>
+          <span>User Approvals</span>
+        </div>
+        <span id="badge-pending-count" class="hidden bg-[#FF6B00] text-[#0B192C] font-mono font-bold text-[9px] px-1.5 py-0.5 rounded-full">0</span>
+      </button>
+      <button onclick="switchTab('admins')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+        <span>Admin Management</span>
+      </button>
+      <button onclick="switchTab('policies')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="sliders" class="w-4 h-4"></i>
+        <span>Reward Policies</span>
+      </button>
+      <button onclick="switchTab('financials')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="indian-rupee" class="w-4 h-4"></i>
+        <span>Financial Dashboard</span>
+      </button>
+      <button onclick="switchTab('analytics')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="trending-up" class="w-4 h-4"></i>
+        <span>Business Analytics</span>
+      </button>
+      <button onclick="switchTab('logs')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="terminal" class="w-4 h-4"></i>
+        <span>Audit Logs</span>
+      </button>
+      <button onclick="switchTab('settings')" class="menu-item w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-left">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+        <span>System Configuration</span>
+      </button>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t border-slate-800 space-y-2">
+      <div class="text-[9px] font-mono text-slate-500 text-center">
+        NODE ENGINE v2.0.26
+      </div>
+      <button onclick="handleLogout()" class="w-full py-2 bg-slate-950 hover:bg-red-950 hover:text-red-400 text-slate-400 font-bold text-xs rounded-lg border border-slate-800 transition flex items-center justify-center gap-2">
+        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="flex-grow flex flex-col min-w-0 md:ml-64 h-full overflow-hidden">
+    
+    <!-- Top Navbar -->
+    <header class="h-16 border-b border-slate-800 bg-slate-900/40 backdrop-blur px-4 flex items-center justify-between sticky top-0 z-30">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="text-[#FF6B00] font-bold">Owner Portal</span>
+          <span class="text-slate-600">/</span>
+          <span id="breadcrumb-title" class="text-slate-400 capitalize">Dashboard</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Live system state indicator -->
+        <span class="hidden sm:inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          REST API: SECURE
+        </span>
+        <!-- Notification bell -->
+        <div class="relative">
+          <button onclick="toggleNotificationDrop()" class="p-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition relative">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span id="badge-notif" class="hidden absolute top-1 right-1 w-2 h-2 rounded-full bg-[#FF6B00]"></span>
+          </button>
+          <!-- Notification Drop-down -->
+          <div id="notif-dropdown" class="absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-800 rounded-lg shadow-2xl p-4 hidden z-50">
+            <h4 class="text-xs font-bold text-white mb-2">Recent System Updates</h4>
+            <div id="notif-list" class="space-y-2 max-h-48 overflow-y-auto text-[10px]">
+              <p class="text-slate-500">No unread alerts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Screen Panels Scroll Container -->
+    <main class="flex-grow p-4 sm:p-6 overflow-y-auto relative">
+      
+      <!-- Screen 1: Dashboard Panel -->
+      <section id="panel-dashboard" class="panel space-y-6">
+        <!-- Grid card stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Stat 1 -->
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Retailer Count</span>
+              <span class="text-2xl font-black text-white font-mono" id="stat-retailers-count">0</span>
+              <span class="text-[9px] text-emerald-500 font-mono block">&bull; Approved Users</span>
+            </div>
+            <div class="p-3 bg-orange-500/10 text-[#FF6B00] rounded-lg">
+              <i data-lucide="store" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <!-- Stat 2 -->
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Mechanic Count</span>
+              <span class="text-2xl font-black text-white font-mono" id="stat-mechanics-count">0</span>
+              <span class="text-[9px] text-emerald-500 font-mono block">&bull; Approved Users</span>
+            </div>
+            <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
+              <i data-lucide="wrench" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <!-- Stat 3 -->
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Total Points issued</span>
+              <span class="text-2xl font-black text-white font-mono" id="stat-points-issued">0</span>
+              <span class="text-[9px] text-amber-500 font-mono block">&bull; In Circulation</span>
+            </div>
+            <div class="p-3 bg-amber-500/10 text-amber-400 rounded-lg">
+              <i data-lucide="award" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <!-- Stat 4 -->
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Pending Approvals</span>
+              <span class="text-2xl font-black text-[#FF6B00] font-mono animate-pulse" id="stat-pending-approvals">0</span>
+              <span class="text-[9px] text-slate-500 font-mono block">&bull; Awaiting Review</span>
+            </div>
+            <div class="p-3 bg-red-500/10 text-red-400 rounded-lg">
+              <i data-lucide="user-plus" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle split layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Pending lists Quick actions -->
+          <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 class="font-bold text-white text-sm">Action Required: Pending Registrations</h3>
+              <button onclick="switchTab('approvals')" class="text-xs text-[#FF6B00] font-semibold hover:underline">View All</button>
+            </div>
+            <!-- Quick list table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[9px]">
+                    <th class="py-2">Name</th>
+                    <th class="py-2">Type</th>
+                    <th class="py-2">Firm</th>
+                    <th class="py-2">Mobile</th>
+                    <th class="py-2 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="quick-pending-tbody" class="divide-y divide-slate-800/60 font-medium">
+                  <tr>
+                    <td colspan="5" class="py-4 text-center text-slate-500 font-mono">No pending registrations.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Quick Owner Tasks -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">Superuser Quick Actions</h3>
+            <div class="grid grid-cols-1 gap-2.5">
+              <button onclick="switchTab('admins')" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-left hover:border-purple-500 transition text-xs flex items-center justify-between">
+                <span class="text-purple-400 font-bold">Add Admin User</span>
+                <i data-lucide="plus-circle" class="w-4 h-4 text-purple-400"></i>
+              </button>
+              <button onclick="switchTab('policies')" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-left hover:border-[#FF6B00] transition text-xs flex items-center justify-between">
+                <span class="text-amber-500 font-bold">Adjust Points Multiplier</span>
+                <i data-lucide="percent" class="w-4 h-4 text-amber-500"></i>
+              </button>
+              <button onclick="switchTab('settings')" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-left hover:border-emerald-500 transition text-xs flex items-center justify-between">
+                <span class="text-emerald-400 font-bold">Database Backup & Sync</span>
+                <i data-lucide="cloud-download" class="w-4 h-4 text-emerald-400"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 2: User Approvals Panel -->
+      <section id="panel-approvals" class="panel space-y-6 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div>
+              <h3 class="font-bold text-white text-sm">Comprehensive Membership Roster</h3>
+              <p class="text-xs text-slate-500">Approve, reject, or suspend member accounts.</p>
+            </div>
+            <!-- Role Filters -->
+            <div class="flex flex-wrap gap-2">
+              <button onclick="filterApprovalUsers('all')" id="btn-filter-all" class="px-3 py-1.5 bg-[#FF6B00] text-white text-xs font-bold rounded-lg transition">All Roles</button>
+              <button onclick="filterApprovalUsers('retailer')" id="btn-filter-retailer" class="px-3 py-1.5 bg-slate-950 border border-slate-800 text-slate-400 hover:text-white text-xs font-bold rounded-lg transition">Retailers</button>
+              <button onclick="filterApprovalUsers('mechanic')" id="btn-filter-mechanic" class="px-3 py-1.5 bg-slate-950 border border-slate-800 text-slate-400 hover:text-white text-xs font-bold rounded-lg transition">Mechanics</button>
+              <button onclick="filterApprovalUsers('pending')" id="btn-filter-pending" class="px-3 py-1.5 bg-slate-950 border border-slate-800 text-slate-400 hover:text-white text-xs font-bold rounded-lg transition">Pending Only</button>
+            </div>
+          </div>
+
+          <!-- User Approval Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[9px]">
+                  <th class="py-3">Member Info</th>
+                  <th class="py-3">Type</th>
+                  <th class="py-3">Firm Name</th>
+                  <th class="py-3">Location</th>
+                  <th class="py-3">Status</th>
+                  <th class="py-3">Total Points</th>
+                  <th class="py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="approvals-tbody" class="divide-y divide-slate-800/60 font-medium">
+                <tr>
+                  <td colspan="7" class="py-6 text-center text-slate-500 font-mono">Fetching users...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 3: Admin Management -->
+      <section id="panel-admins" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Create Admin Form -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">Create Admin Account</h3>
+            <form onsubmit="handleCreateAdminSubmit(event)" class="space-y-3.5 text-xs">
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="admin-fullname">Full Name</label>
+                <input type="text" id="admin-fullname" required placeholder="A. K. Sharma"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="admin-email">Email Address</label>
+                <input type="email" id="admin-email" required placeholder="admin@vikas.com"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="admin-mobile">Mobile Phone</label>
+                <input type="tel" id="admin-mobile" required pattern="[0-9]{10}" placeholder="9123456789"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="admin-password">Password</label>
+                <input type="password" id="admin-password" required placeholder="••••••••"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition shadow-lg shadow-purple-600/20 flex items-center justify-center gap-1.5">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                <span>Register Admin</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Existing Admin Accounts -->
+          <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">Existing Admins Roster</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[9px]">
+                    <th class="py-2.5">Name</th>
+                    <th class="py-2.5">Email</th>
+                    <th class="py-2.5">Mobile</th>
+                    <th class="py-2.5">Registration Date</th>
+                    <th class="py-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admins-tbody" class="divide-y divide-slate-800/60 font-medium">
+                  <tr>
+                    <td colspan="5" class="py-6 text-center text-slate-500 font-mono">Fetching admin accounts...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 4: Reward Policies -->
+      <section id="panel-policies" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Policy Formula adjustment -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">Loyalty Multiplication System</h3>
+            <form onsubmit="handlePolicyFormSubmit(event)" class="space-y-4 text-xs">
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="policy-retailer-mult">Retailer Base Points Multiplier</label>
+                <input type="number" step="0.1" id="policy-retailer-mult" required value="1.0"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+                <span class="text-[10px] text-slate-500 mt-1 block">Points = Product Points &times; Quantity &times; Retailer Multiplier</span>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="policy-mechanic-mult">Mechanic Base Points Multiplier</label>
+                <input type="number" step="0.1" id="policy-mechanic-mult" required value="1.2"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+                <span class="text-[10px] text-slate-500 mt-1 block">Points = Product Points &times; Quantity &times; Mechanic Multiplier</span>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-bold text-slate-400 mb-1" for="policy-silver-thresh">Silver Tier (Pts)</label>
+                  <input type="number" id="policy-silver-thresh" required value="5000"
+                    class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-400 mb-1" for="policy-gold-thresh">Gold Tier (Pts)</label>
+                  <input type="number" id="policy-gold-thresh" required value="15000"
+                    class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none">
+                </div>
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-[#FF6B00] text-white font-bold rounded-lg hover:bg-[#e05e00] transition shadow-lg shadow-[#FF6B00]/20">
+                Apply Multiplier Policy
+              </button>
+            </form>
+          </div>
+
+          <!-- Active Points Rule Explanation -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">Active Policy Overview</h3>
+            <div class="space-y-3.5 text-xs">
+              <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                <span class="text-[10px] font-mono text-slate-500 uppercase block">Active Rule</span>
+                <p class="font-semibold text-white mt-1">Multipliers are applied server-side on every purchase scan approval instantly.</p>
+              </div>
+              <div class="space-y-2">
+                <h4 class="font-bold text-slate-400">Current Loyalty Mechanics:</h4>
+                <ul class="list-disc pl-4 space-y-1 text-slate-400">
+                  <li>Points claim requires dual-layered validation (Admin verification &bull; Owner auto-sync approval).</li>
+                  <li>Duplicate scanning triggers an automatic fraud flag in the Audit Logs, alerting all administrators.</li>
+                  <li>Tiers affect points redemption catalogs and access levels.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 5: Financial Dashboard -->
+      <section id="panel-financials" class="panel space-y-6 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="font-bold text-white text-sm">Loyalty Program Ledger Balance</h3>
+              <p class="text-xs text-slate-500">Track point-to-cash conversions and redemption liability.</p>
+            </div>
+            <button onclick="exportReports('financials')" class="px-3 py-1.5 bg-slate-950 border border-slate-800 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition flex items-center gap-1">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Export Ledger</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <div class="p-4 bg-slate-950 rounded-lg border border-slate-800">
+              <span class="text-slate-500 text-[10px] block font-mono uppercase font-semibold">Convertible Point Liability</span>
+              <span class="text-xl font-black text-white font-mono mt-1 block" id="financial-total-circulation">0 Pts</span>
+              <span class="text-[9px] text-slate-500 block mt-0.5">&bull; Active across all user accounts</span>
+            </div>
+            <div class="p-4 bg-slate-950 rounded-lg border border-slate-800">
+              <span class="text-slate-500 text-[10px] block font-mono uppercase font-semibold">Total Cashback Redeemed</span>
+              <span class="text-xl font-black text-emerald-400 font-mono mt-1 block" id="financial-total-redeemed font-semibold">₹ 0.00</span>
+              <span class="text-[9px] text-emerald-500 block mt-0.5">&bull; Verified pay-out records</span>
+            </div>
+            <div class="p-4 bg-slate-950 rounded-lg border border-slate-800">
+              <span class="text-slate-500 text-[10px] block font-mono uppercase font-semibold">Pending Approvals Liabilities</span>
+              <span class="text-xl font-black text-[#FF6B00] font-mono mt-1 block" id="financial-pending-liability">0 Pts</span>
+              <span class="text-[9px] text-slate-500 block mt-0.5">&bull; Unprocessed scans</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 6: Business Analytics -->
+      <section id="panel-analytics" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+            <h3 class="font-bold text-white text-sm">Monthly Points Disbursements</h3>
+            <div class="h-64 relative">
+              <canvas id="chart-disbursements"></canvas>
+            </div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+            <h3 class="font-bold text-white text-sm">Active Scanner Share</h3>
+            <div class="h-64 relative">
+              <canvas id="chart-scanner-share"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 7: Audit Logs -->
+      <section id="panel-logs" class="panel space-y-6 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="font-bold text-white text-sm">Immutable Security Audits</h3>
+              <p class="text-xs text-slate-500">Every user login, scan, approval, or settings modification is logged.</p>
+            </div>
+            <button onclick="clearSimulatedLogs()" class="px-3 py-1.5 bg-slate-950 border border-slate-800 hover:text-red-400 text-slate-500 rounded-lg text-xs font-semibold transition">
+              Reset Log Feed
+            </button>
+          </div>
+          
+          <!-- Logs listing -->
+          <div class="bg-slate-950 rounded-lg p-3 border border-slate-800 max-h-[400px] overflow-y-auto space-y-2 font-mono text-xs text-slate-400" id="audit-logs-container">
+            <div class="flex gap-4 border-b border-slate-900 pb-2">
+              <span class="text-[#FF6B00] font-bold shrink-0">[2026-07-03 09:28:45]</span>
+              <span class="text-purple-400 shrink-0 uppercase text-[10px] bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20 font-bold font-sans">SYS_INIT</span>
+              <span class="text-slate-300">Vikas Automobiles Superuser Node connected from IP 192.168.1.1</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 8: System Configuration -->
+      <section id="panel-settings" class="panel space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Contact information and corporate details -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">Corporate Settings</h3>
+            <form onsubmit="handleSettingsFormSubmit(event)" class="space-y-3.5 text-xs">
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="set-company">Company Name</label>
+                <input type="text" id="set-company" required value="Vikas Automobiles Ltd."
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="set-email">SMTP Support Email</label>
+                <input type="email" id="set-email" required value="loyalty@vikasautomobiles.com"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-[#FF6B00]">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-400 mb-1" for="set-phone">WhatsApp/SMS helpline</label>
+                <input type="text" id="set-phone" required value="+91 99999 88888"
+                  class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none">
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-[#FF6B00] text-white font-bold rounded-lg hover:bg-[#e05e00] transition">
+                Update Corporate Profile
+              </button>
+            </form>
+          </div>
+
+          <!-- Backup and Data Recovery -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-sm border-b border-slate-800 pb-3">Database Maintenance</h3>
+            <div class="space-y-4 text-xs">
+              <p class="text-slate-400 leading-relaxed">
+                As the database is hosted entirely on Google Sheets, the backup utilities compile the entire workbook state into a single JSON dump, which can be downloaded locally or restored directly.
+              </p>
+              <div class="grid grid-cols-2 gap-3">
+                <button onclick="handleBackupData()" class="py-2.5 bg-slate-950 border border-slate-800 hover:border-slate-700 text-white font-bold rounded-lg transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="cloud-download" class="w-4 h-4"></i>
+                  <span>Backup Database</span>
+                </button>
+                <button onclick="handleRestoreData()" class="py-2.5 bg-slate-950 border border-slate-800 hover:border-red-500 hover:text-red-400 text-slate-400 font-bold rounded-lg transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+                  <span>Restore Dump</span>
+                </button>
+              </div>
+              <div class="p-3 bg-[#FF6B00]/5 rounded-lg border border-[#FF6B00]/10 flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-[#FF6B00] shrink-0 mt-0.5"></i>
+                <p class="text-[10px] text-slate-400 leading-normal">
+                  Restoring database overrides every single row across all 14 spreadsheets. Only run this utility when resolving absolute catalog synchronization breakdowns.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- User Detail View Modal -->
+  <div id="user-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
+      <button onclick="closeUserDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="flex items-center gap-4 border-b border-slate-800 pb-4">
+        <img id="detail-photo" src="" alt="Photo" class="w-16 h-16 rounded-full object-cover border border-[#FF6B00]">
+        <div>
+          <h3 class="text-lg font-black text-white" id="detail-fullname">Full Name</h3>
+          <span id="detail-role" class="text-[10px] font-mono uppercase bg-slate-950 px-2 py-0.5 rounded text-amber-500 font-bold">RETAILER</span>
+        </div>
+      </div>
+      <!-- Detail Cards Grid -->
+      <div class="grid grid-cols-2 gap-4 text-xs">
+        <div>
+          <span class="text-slate-500 block uppercase font-bold text-[9px]">Firm Name</span>
+          <span class="font-semibold text-white block mt-0.5" id="detail-firm">Not Applicable</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block uppercase font-bold text-[9px]">Email Address</span>
+          <span class="font-semibold text-white block mt-0.5 break-all" id="detail-email">-</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block uppercase font-bold text-[9px]">Mobile Phone</span>
+          <span class="font-semibold text-white block mt-0.5" id="detail-mobile">-</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block uppercase font-bold text-[9px]">GSTIN ID</span>
+          <span class="font-semibold text-white block mt-0.5 uppercase" id="detail-gst">-</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block uppercase font-bold text-[9px]">PAN Card</span>
+          <span class="font-semibold text-white block mt-0.5 uppercase" id="detail-pan">-</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block uppercase font-bold text-[9px]">Pincode</span>
+          <span class="font-semibold text-white block mt-0.5" id="detail-pincode">-</span>
+        </div>
+      </div>
+      <div class="text-xs pt-2 border-t border-slate-800">
+        <span class="text-slate-500 block uppercase font-bold text-[9px]">Complete Address</span>
+        <span class="font-medium text-slate-300 block mt-1" id="detail-address">-</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification system -->
+  <div id="toast-root" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Global Loader Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4 hidden">
+    <div class="w-12 h-12 border-4 border-slate-800 border-t-[#FF6B00] rounded-full animate-spin"></div>
+    <p class="text-xs text-slate-400 font-mono" id="loading-text">Contacting central node...</p>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/owner.js"></script>
+  <script>
+    // Build initial widgets
+    lucide.createIcons();
+    initOwnerPage();
+  </script>
+</body>
+</html>
