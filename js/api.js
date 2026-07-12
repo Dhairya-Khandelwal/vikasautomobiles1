@@ -845,10 +845,13 @@ const API = {
 
   // === 11. REWARDS CATALOGUE & REDEMPTION API ===
   getRewards: async () => {
-    let rewards = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.REWARDS);
-    if (rewards.length === 0) {
+    const storageKey = window.CONFIG.STORAGE_KEYS.REWARDS;
+    const neverInitialized = localStorage.getItem(storageKey) === null;
+    let rewards = window.UTILS.getLocal(storageKey);
+
+    if (neverInitialized) {
       rewards = window.CONFIG.DEFAULT_REWARDS;
-      window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.REWARDS, rewards);
+      window.UTILS.setLocal(storageKey, rewards);
     }
     return rewards;
   },
