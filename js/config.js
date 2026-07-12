@@ -8,7 +8,7 @@ const CONFIG = {
   // This ships with Google's official PUBLIC TEST key, which always validates successfully
   // and is safe to use on any domain during development. Replace it with your own site key
   // from https://www.google.com/recaptcha/admin before going live.
-  RECAPTCHA_SITE_KEY: "6Lci5E0tAAAAAP-R4qk0WZlf_wXBuyfGwKzVrIqi",
+  RECAPTCHA_SITE_KEY: "6Ld85U8tAAAAAJmB3McZgH9l802Rgwd_TtQo9Z0K",
 
   // Local Storage Database Keys for extreme offline reliability
   STORAGE_KEYS: {
