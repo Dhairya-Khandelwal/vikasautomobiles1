@@ -571,51 +571,30 @@
             <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Sticker Label Sticker Preview</h3>
             
             <div class="flex flex-col sm:flex-row items-center justify-center gap-8 py-6">
-              <!-- Render sticker card -->
-              <div id="sticker-label" class="w-64 bg-white text-slate-900 p-4 rounded-lg shadow-xl space-y-3 border border-slate-300 font-sans hidden">
-                <div class="flex items-center justify-between border-b-2 border-slate-900 pb-1">
-                  <span class="font-black text-xs tracking-tight uppercase">VIKAS AUTOMOBILES</span>
-                  <span class="text-[8px] font-mono font-bold bg-slate-900 text-white px-1 rounded" id="label-prod-id">P-001</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <div id="qr-canvas-container" class="p-1 bg-white border border-slate-400 rounded">
-                    <!-- Target for qrcode-generator -->
-                  </div>
-                  <div class="min-w-0 flex-grow text-[9px] font-mono leading-tight space-y-0.5">
-                    <p class="font-bold truncate" id="label-prod-name">Part Name</p>
-                    <p id="label-brand">Brand: -</p>
-                    
-                    <p id="label-pack">Size: -</p>
-                    <p id="label-qty">Qty: -</p>
-                    
-                  </div>
-                </div>
-                <div class="text-[8px] font-mono text-center text-slate-500 border-t border-slate-200 pt-1.5">
-                  SCAN VIA APP TO ACCUMULATE LOYALTY POINTS
-                </div>
-              </div>
-
-              <!-- empty state -->
-              <div id="qr-empty-state" class="text-center py-12 text-slate-400 font-mono text-xs space-y-2">
-                <i data-lucide="qr-code" class="w-12 h-12 mx-auto text-slate-300 animate-pulse"></i>
-                <p>Configure and generate loyalty sticker preview.</p>
-              </div>
-
-              <div id="qr-actions-panel" class="hidden flex-col gap-2">
-                <button onclick="downloadQrSticker()" class="px-4 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
-                  <i data-lucide="download" class="w-4 h-4 text-blue-600"></i>
-                  <span>Download Sticker JPG</span>
-                </button>
-                <button onclick="printQrSticker()" class="px-4 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
-                  <i data-lucide="printer" class="w-4 h-4 text-blue-600"></i>
-                  <span>Print Parts Label</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+             <!-- Render sticker card -->
+<div id="sticker-label" class="w-64 bg-white text-slate-900 p-4 rounded-lg shadow-xl space-y-3 border border-slate-300 font-sans hidden">
+  <div class="flex items-center justify-between border-b-2 border-slate-900 pb-1">
+    <span class="font-black text-xs tracking-tight uppercase">VIKAS AUTOMOBILES, SATNA (HPCL LUBE DISTRIBUTOR)</span>
+    <span id="label-prod-id" contenteditable="true"
+      class="text-[8px] font-mono font-bold bg-slate-900 text-white px-1 rounded outline-none focus:ring-2 focus:ring-blue-400">P-001</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <div id="qr-canvas-container" class="p-1 bg-white border border-slate-400 rounded">
+      <!-- Target for qrcode-generator -->
+    </div>
+    <div class="min-w-0 flex-grow text-[9px] font-mono leading-tight space-y-0.5">
+      <p id="label-prod-name" contenteditable="true" class="font-bold truncate outline-none focus:ring-2 focus:ring-blue-400 rounded">Part Name</p>
+      <p id="label-brand" contenteditable="true" class="outline-none focus:ring-2 focus:ring-blue-400 rounded">Brand: -</p>
+      <p id="label-batch" contenteditable="true" class="outline-none focus:ring-2 focus:ring-blue-400 rounded">Batch: -</p>
+      <p id="label-pack" contenteditable="true" class="outline-none focus:ring-2 focus:ring-blue-400 rounded">Size: -</p>
+      <p id="label-qty" contenteditable="true" class="outline-none focus:ring-2 focus:ring-blue-400 rounded">Qty: -</p>
+      <p id="label-mfg" contenteditable="true" class="outline-none focus:ring-2 focus:ring-blue-400 rounded">MFG: -</p>
+    </div>
+  </div>
+  <div class="text-[8px] font-mono text-center text-slate-500 border-t border-slate-200 pt-1.5">
+    SCAN VIA APP TO ACCUMULATE LOYALTY POINTS
+  </div>
+</div>
       <!-- Panel 6B: QR Code Claim Validation Management -->
       <section id="panel-qr-claims" class="panel space-y-6 hidden">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
