@@ -1133,9 +1133,7 @@ function loadProductQrMetadata() {
   }
 }
 
-// ---------------- DYNAMIC PRODUCT QR CODES GENERATOR ----------------
 let activeGeneratedProduct = null;
-let activeQrPayloadBase = null; // holds the non-editable payload fields (part id, points, serial)
 
 function generateProductQrGraphic() {
   const prodId = document.getElementById("qr-select-product").value;
@@ -1149,32 +1147,45 @@ function generateProductQrGraphic() {
   if (!prod) return;
   activeGeneratedProduct = prod;
 
-  // Retrieve customized values from the form fields
+  // Retrieve customized values from fields
   const customName = document.getElementById("qr-name").value || prod.name;
   const customPack = document.getElementById("qr-pack").value || prod.packSize || "1 Unit";
   const customQty = document.getElementById("qr-qty").value || "1";
   const customBatch = document.getElementById("qr-batch").value || "B-2026-07";
-  const mfgVal = document.getElementById("qr-mfg-date").value;
-  const mfgText = mfgVal ? window.UTILS.formatDate(new Date(mfgVal).toISOString()) : "03-Jul-2026";
 
-  // Fill the editable sticker labels
+  // Render sticker card elements
   document.getElementById("label-prod-id").innerText = prod.id;
   document.getElementById("label-prod-name").innerText = customName;
   document.getElementById("label-brand").innerText = `Brand: ${prod.brand || "Vikas Spares"}`;
   document.getElementById("label-batch").innerText = `Batch: ${customBatch}`;
   document.getElementById("label-pack").innerText = `Size: ${customPack}`;
   document.getElementById("label-qty").innerText = `Qty: ${customQty}`;
-  document.getElementById("label-mfg").innerText = `MFG: ${mfgText}`;
+  
+  const mfgVal = document.getElementById("qr-mfg-date").value;
+  document.getElementById("label-mfg").innerText = `MFG: ${mfgVal ? window.UTILS.formatDate(new Date(mfgVal).toISOString()) : "03-Jul-2026"}`;
 
-  // Keep the non-editable parts of the payload (points/serial) fixed for this sticker
-  activeQrPayloadBase = {
+  // Generate QR code vector
+  const payload = {
     app: "VikasRewards",
     v: 1,
     part: prod.id,
+    name: customName,
+    pack: customPack,
+    qty: Number(customQty) || 1,
     rpts: prod.retailerPoints,
     mpts: prod.mechanicPoints,
     serial: `S-${Math.floor(100000 + Math.random() * 900000)}`
   };
+
+  const payloadStr = JSON.stringify(payload);
+  const container = document.getElementById("qr-canvas-container");
+  if (container) {
+    container.innerHTML = "";
+    const qr = qrcode(0, 'M');
+    qr.addData(payloadStr);
+    qr.make();
+    container.innerHTML = qr.createSvgTag(2.5, 1);
+  }
 
   // Adjust display visibility
   document.getElementById("qr-empty-state").classList.add("hidden");
@@ -1184,66 +1195,18 @@ function generateProductQrGraphic() {
   // Apply the currently selected sticker format (colors/border/QR frame)
   window.UTILS.applyStickerTemplateStyle();
 
-  // Draw the QR code from whatever is currently in the labels
-  redrawQrFromLabels();
-
   lucide.createIcons();
   window.UTILS.showToast(`Sticker generated for ${customName}!`, "success");
 }
 
-// Re-reads whatever text is currently in the editable labels and
-// re-encodes the QR code so it always matches what's on the sticker.
-function redrawQrFromLabels() {
-  if (!activeQrPayloadBase) return;
-
-  const payload = {
-    ...activeQrPayloadBase,
-    part: document.getElementById("label-prod-id").innerText.trim() || activeQrPayloadBase.part,
-    name: document.getElementById("label-prod-name").innerText.trim(),
-    brand: document.getElementById("label-brand").innerText.replace(/^Brand:\s*/i, "").trim(),
-    batch: document.getElementById("label-batch").innerText.replace(/^Batch:\s*/i, "").trim(),
-    pack: document.getElementById("label-pack").innerText.replace(/^Size:\s*/i, "").trim(),
-    qty: Number(document.getElementById("label-qty").innerText.replace(/^Qty:\s*/i, "").trim()) || 1,
-    mfg: document.getElementById("label-mfg").innerText.replace(/^MFG:\s*/i, "").trim()
-  };
-
-  const payloadStr = JSON.stringify(payload);
-  const container = document.getElementById("qr-canvas-container");
-  if (!container) return;
-
-  container.innerHTML = "";
-  const qr = qrcode(0, 'M');
-  qr.addData(payloadStr);
-  qr.make();
-  container.innerHTML = qr.createSvgTag(2.5, 1);
-}
-
-// Wire up live QR re-sync whenever an editable label loses focus.
-document.addEventListener("DOMContentLoaded", () => {
-  const editableIds = [
-    "label-prod-id", "label-prod-name", "label-brand",
-    "label-batch", "label-pack", "label-qty", "label-mfg"
-  ];
-  editableIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("blur", redrawQrFromLabels);
-      // Prevent Enter key from inserting a newline inside the label
-      el.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); el.blur(); }
-      });
-    }
-  });
-});
-
+// Called when the admin picks a different Sticker Format from the dropdown.
 function handleStickerTemplateChange(templateKey) {
   window.UTILS.setStickerTemplateKey(templateKey);
+  // Restyle the live preview immediately if a sticker is already showing
   window.UTILS.applyStickerTemplateStyle();
   window.UTILS.showToast(`Sticker format set to ${window.CONFIG.STICKER_TEMPLATES[templateKey].label}.`, "success");
 }
 window.handleStickerTemplateChange = handleStickerTemplateChange;
-window.generateProductQrGraphic = generateProductQrGraphic;
-window.redrawQrFromLabels = redrawQrFromLabels;
 
 function downloadQrSticker() {
   if (!activeGeneratedProduct) return;
