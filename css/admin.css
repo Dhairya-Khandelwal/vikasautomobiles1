@@ -2,3 +2,105 @@
 .qr-sticker-border {
   border: 2px dashed rgba(168, 85, 247, 0.4);
 }
+/* ===================================
+   EDIT QR STICKER MODAL
+=================================== */
+
+#editQRModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+}
+
+#editQRModal.hidden {
+    display: none;
+}
+
+#editQRModal.flex {
+    display: flex;
+}
+
+#editQRModal .modal-container {
+    background: #ffffff;
+    width: 90%;
+    max-width: 800px;
+    margin: auto;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+#editQRModal input,
+#editQRModal select,
+#editQRModal textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+#editQRModal input:focus,
+#editQRModal select:focus,
+#editQRModal textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+#editQRModal label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+#editQRModal textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.edit-qr-save-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.edit-qr-save-btn:hover {
+    background: #1d4ed8;
+}
+
+.edit-qr-cancel-btn {
+    background: #e5e7eb;
+    color: #111827;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.edit-qr-cancel-btn:hover {
+    background: #d1d5db;
+}
+
+.btn-edit-qr {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-edit-qr:hover {
+    background: #d97706;
+}
