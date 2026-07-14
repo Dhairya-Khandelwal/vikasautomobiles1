@@ -879,9 +879,11 @@ const API = {
   },
 
   getRedemptions: async () => {
-    let redemptions = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.REDEMPTIONS);
-    if (redemptions.length === 0) {
-      // Seed default redemptions
+    const storageKey = window.CONFIG.STORAGE_KEYS.REDEMPTIONS;
+    const neverInitialized = localStorage.getItem(storageKey) === null;
+    let redemptions = window.UTILS.getLocal(storageKey);
+    if (neverInitialized) {
+      // Seed default redemptions (only on very first load, not every time the list is empty)
       redemptions = [
         {
           id: "RDM-2049",
@@ -896,7 +898,7 @@ const API = {
           date: new Date(Date.now() - 3600000 * 4).toISOString()
         }
       ];
-      window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.REDEMPTIONS, redemptions);
+      window.UTILS.setLocal(storageKey, redemptions);
     }
     return redemptions;
   },
