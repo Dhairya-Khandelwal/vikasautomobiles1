@@ -1298,6 +1298,58 @@ function printQrSticker() {
     return;
   }
 
+  function openEditQrModal() {
+
+    document.getElementById("editQRModal").classList.remove("hidden");
+    document.getElementById("editQRModal").classList.add("flex");
+
+}
+
+  function closeEditQrModal() {
+
+    document.getElementById("editQRModal").classList.remove("flex");
+    document.getElementById("editQRModal").classList.add("hidden");
+
+}
+
+  function loadStickerIntoEditor(sticker){
+
+    document.getElementById("editQrId").value = sticker.id;
+    document.getElementById("editProduct").value = sticker.product;
+    document.getElementById("editBatch").value = sticker.batch;
+    document.getElementById("editPack").value = sticker.pack;
+    document.getElementById("editRetailerPrice").value = sticker.retailerPrice;
+    document.getElementById("editMechanicPrice").value = sticker.mechanicPrice;
+    document.getElementById("editPoints").value = sticker.points;
+    document.getElementById("editStatus").value = sticker.status;
+    document.getElementById("editRemarks").value = sticker.remarks;
+
+}
+
+  async function saveEditedQr(){
+
+    const sticker = {
+
+        id: document.getElementById("editQrId").value,
+        product: document.getElementById("editProduct").value,
+        batch: document.getElementById("editBatch").value,
+        pack: document.getElementById("editPack").value,
+        retailerPrice: document.getElementById("editRetailerPrice").value,
+        mechanicPrice: document.getElementById("editMechanicPrice").value,
+        points: document.getElementById("editPoints").value,
+        status: document.getElementById("editStatus").value,
+        remarks: document.getElementById("editRemarks").value
+
+    };
+
+    await updateQrSticker(sticker);
+
+    alert("QR Sticker Updated Successfully");
+
+    closeEditQrModal();
+
+}
+
   const stickerHtml = document.getElementById("sticker-label").outerHTML;
   printWindow.document.write(`
     <html>
