@@ -606,6 +606,10 @@
                   <i data-lucide="download" class="w-4 h-4 text-blue-600"></i>
                   <span>Download Sticker JPG</span>
                 </button>
+                <button onclick="openEditQrModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer">
+                  <i data-lucide="square-pen" class="w-4 h-4"></i>
+                  <span>Edit Sticker</span>
+                </button>
                 <button onclick="printQrSticker()" class="px-4 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
                   <i data-lucide="printer" class="w-4 h-4 text-blue-600"></i>
                   <span>Print Parts Label</span>
@@ -1718,10 +1722,12 @@
   <script src="js/i18n.js"></script>
   <script src="js/exporter.js"></script>
   <script src="js/admin.js"></script>
+  
   <script>
     lucide.createIcons();
     initAdminPage();
     I18N.init();
   </script>
+  
 </body>
 </html>
