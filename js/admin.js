@@ -2933,4 +2933,21 @@ window.loadRewardsAndRedemptions = loadRewardsAndRedemptions;
 
 
 
+function openEditQrModal() {
+    const modal = document.getElementById("editQRModal");
 
+    if (!modal) {
+        console.error("editQRModal not found");
+        return;
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+function closeEditQrModal() {
+    const modal = document.getElementById("editQRModal");
+
+    modal.classList.remove("flex");
+    modal.classList.add("hidden");
+}
