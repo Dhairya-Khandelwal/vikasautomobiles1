@@ -864,7 +864,7 @@ function renderUsersTable(list) {
         <td class="py-3 pl-2">
           <input type="checkbox" data-user-email="${u.email}" onchange="updateUsersSelection()" class="user-select-checkbox rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer">
         </td>
-        <td class="py-3 font-bold text-slate-900">${u.fullname}<br><span class="text-[9px] text-slate-500 font-mono font-normal">${window.UTILS.displayEmail(u.email)}</span></td>
+        <td class="py-3 font-bold text-slate-900">${u.fullname && u.fullname.trim() ? u.fullname : window.UTILS.displayEmail(u.email)}<br><span class="text-[9px] text-slate-500 font-mono font-normal">${window.UTILS.displayEmail(u.email)}</span></td>
         <td class="py-3 capitalize text-slate-600 font-semibold font-mono text-[10px]">${u.role}</td>
         <td class="py-3 text-slate-600">${u.firmName || "-"}</td>
         <td class="py-3 text-slate-600 font-mono">${u.mobile}<br><span class="text-[9px] text-slate-400">Pincode: ${u.pincode || "-"}</span></td>
@@ -968,7 +968,7 @@ function handleUserSearch(query) {
     u.fullname.toLowerCase().includes(q) ||
     u.email.toLowerCase().includes(q) ||
     (u.firmName && u.firmName.toLowerCase().includes(q)) ||
-    u.mobile.includes(q)
+    String(u.mobile || "").includes(q)
   );
   renderUsersTable(filtered);
 }
