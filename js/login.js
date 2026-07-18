@@ -265,9 +265,14 @@ async function handlePasswordLogin(event) {
       captchaToken = null;
 
       // 3. Update the verification form's contextual copy
-      const maskedMobile = user.mobile && user.mobile.length >= 10
-        ? `+91 ******${user.mobile.slice(-4)}`
-        : (user.mobile || user.email);
+      // NOTE: mobile can come back from the API as a Number (Sheets auto-typing),
+      // so String(...) it before calling .length/.slice — otherwise this throws
+      // and silently aborts the entire login flow for EVERY identifier type,
+      // not just mobile logins.
+      const mobileStr = user.mobile ? String(user.mobile) : "";
+      const maskedMobile = mobileStr.length >= 10
+        ? `+91 ******${mobileStr.slice(-4)}`
+        : (mobileStr || user.email);
 
       const maskedMobileEl = document.getElementById('otp-masked-mobile');
       if (maskedMobileEl) {
