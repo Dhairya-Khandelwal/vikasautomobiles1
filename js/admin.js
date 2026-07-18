@@ -1134,6 +1134,7 @@ function loadProductQrMetadata() {
 }
 
 let activeGeneratedProduct = null;
+let activeStickerMeta = null;
 
 function generateProductQrGraphic() {
   const prodId = document.getElementById("qr-select-product").value;
@@ -1163,6 +1164,9 @@ function generateProductQrGraphic() {
   
   const mfgVal = document.getElementById("qr-mfg-date").value;
   document.getElementById("label-mfg").innerText = `MFG: ${mfgVal ? window.UTILS.formatDate(new Date(mfgVal).toISOString()) : "03-Jul-2026"}`;
+
+  // Remember exactly what was used to generate this sticker, so "Edit Sticker" can restore it
+  activeStickerMeta = { customName, customPack, customQty, customBatch, mfgVal };
 
   // Generate QR code vector
   const payload = {
@@ -1297,58 +1301,6 @@ function printQrSticker() {
     window.UTILS.showToast("Print window blocked. Please permit pop-ups.", "warning");
     return;
   }
-
-  function openEditQrModal() {
-
-    document.getElementById("editQRModal").classList.remove("hidden");
-    document.getElementById("editQRModal").classList.add("flex");
-
-}
-
-  function closeEditQrModal() {
-
-    document.getElementById("editQRModal").classList.remove("flex");
-    document.getElementById("editQRModal").classList.add("hidden");
-
-}
-
-  function loadStickerIntoEditor(sticker){
-
-    document.getElementById("editQrId").value = sticker.id;
-    document.getElementById("editProduct").value = sticker.product;
-    document.getElementById("editBatch").value = sticker.batch;
-    document.getElementById("editPack").value = sticker.pack;
-    document.getElementById("editRetailerPrice").value = sticker.retailerPrice;
-    document.getElementById("editMechanicPrice").value = sticker.mechanicPrice;
-    document.getElementById("editPoints").value = sticker.points;
-    document.getElementById("editStatus").value = sticker.status;
-    document.getElementById("editRemarks").value = sticker.remarks;
-
-}
-
-  async function saveEditedQr(){
-
-    const sticker = {
-
-        id: document.getElementById("editQrId").value,
-        product: document.getElementById("editProduct").value,
-        batch: document.getElementById("editBatch").value,
-        pack: document.getElementById("editPack").value,
-        retailerPrice: document.getElementById("editRetailerPrice").value,
-        mechanicPrice: document.getElementById("editMechanicPrice").value,
-        points: document.getElementById("editPoints").value,
-        status: document.getElementById("editStatus").value,
-        remarks: document.getElementById("editRemarks").value
-
-    };
-
-    await updateQrSticker(sticker);
-
-    alert("QR Sticker Updated Successfully");
-
-    closeEditQrModal();
-
-}
 
   const stickerHtml = document.getElementById("sticker-label").outerHTML;
   printWindow.document.write(`
@@ -2933,21 +2885,37 @@ window.loadRewardsAndRedemptions = loadRewardsAndRedemptions;
 
 
 
+// "Edit Sticker" re-opens the sticker generator form pre-filled with the
+// currently active sticker's values, so the admin can tweak and regenerate.
+// (There used to be a reference to a separate "editQRModal" popup here, but
+// that modal was never actually built into admin.html, which is why the
+// button did nothing when clicked.)
 function openEditQrModal() {
-    const modal = document.getElementById("editQRModal");
+  if (!activeGeneratedProduct) {
+    window.UTILS.showToast("Generate a sticker first before editing it.", "warning");
+    return;
+  }
 
-    if (!modal) {
-        console.error("editQRModal not found");
-        return;
-    }
+  const meta = activeStickerMeta || {};
+  const productSelect = document.getElementById("qr-select-product");
+  const nameField = document.getElementById("qr-name");
+  const packField = document.getElementById("qr-pack");
+  const qtyField = document.getElementById("qr-qty");
+  const batchField = document.getElementById("qr-batch");
+  const mfgField = document.getElementById("qr-mfg-date");
 
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-}
+  if (productSelect) productSelect.value = activeGeneratedProduct.id;
+  if (nameField) nameField.value = meta.customName || activeGeneratedProduct.name || "";
+  if (packField) packField.value = meta.customPack || activeGeneratedProduct.packSize || "";
+  if (qtyField) qtyField.value = meta.customQty || "1";
+  if (batchField) batchField.value = meta.customBatch || "";
+  if (mfgField && meta.mfgVal) mfgField.value = meta.mfgVal;
 
-function closeEditQrModal() {
-    const modal = document.getElementById("editQRModal");
+  const scrollTarget = nameField || productSelect;
+  if (scrollTarget) {
+    scrollTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+    scrollTarget.focus();
+  }
 
-    modal.classList.remove("flex");
-    modal.classList.add("hidden");
+  window.UTILS.showToast("Sticker details loaded into the form below — update the fields and click Generate to refresh the preview.", "info");
 }
