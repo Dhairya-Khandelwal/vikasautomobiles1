@@ -1180,13 +1180,11 @@ function generateProductQrGraphic() {
 
   setText("label-prod-id", prod.id);
   setText("label-prod-name", customName);
-  setText("label-brand", `Brand: ${prod.brand || "Vikas Spares"}`);
-  setText("label-batch", `Batch: ${customBatch}`);
+  setText("label-brand", `Brand: ${prod.brand || "Vikas Automobiles, Satna (HP Lube Distributor)"}`);
   setText("label-pack", `Size: ${customPack}`);
   setText("label-qty", `Qty: ${customQty}`);
 
   const mfgVal = document.getElementById("qr-mfg-date").value;
-  setText("label-mfg", `MFG: ${mfgVal ? window.UTILS.formatDate(new Date(mfgVal).toISOString()) : "03-Jul-2026"}`);
 
   // Remember exactly what was used to generate this sticker, so "Edit Sticker" can restore it
   activeStickerMeta = { customName, customPack, customQty, customBatch, mfgVal };
