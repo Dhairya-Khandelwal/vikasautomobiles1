@@ -1096,6 +1096,13 @@ async function handleSendAnnouncementSubmit(e) {
 async function loadQRGeneratorCatalog() {
   try {
     const products = await window.API.getProducts();
+    // Keep the shared product list in sync — generateProductQrGraphic() and
+    // loadProductQrMetadata() both read from currentProductsList, and if the
+    // admin opens QR Management without visiting Product Management first in
+    // this session, that list would otherwise still be empty and cause the
+    // product lookup to silently fail when Generate is clicked.
+    currentProductsList = products;
+
     const select = document.getElementById("qr-select-product");
     if (!select) return;
 
@@ -1145,7 +1152,10 @@ function generateProductQrGraphic() {
 
   const list = currentProductsList.length > 0 ? currentProductsList : window.CONFIG.DEFAULT_PRODUCTS;
   const prod = list.find(p => p.id === prodId);
-  if (!prod) return;
+  if (!prod) {
+    window.UTILS.showToast("Could not find that product's data. Try reopening the QR Management tab and selecting it again.", "error");
+    return;
+  }
   activeGeneratedProduct = prod;
 
   // Retrieve customized values from fields
