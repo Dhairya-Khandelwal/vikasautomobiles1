@@ -1168,27 +1168,32 @@ function generateProductQrGraphic() {
   // Remember exactly what was used to generate this sticker, so "Edit Sticker" can restore it
   activeStickerMeta = { customName, customPack, customQty, customBatch, mfgVal };
 
-  // Generate QR code vector
-  const payload = {
-    app: "VikasRewards",
-    v: 1,
-    part: prod.id,
-    name: customName,
-    pack: customPack,
-    qty: Number(customQty) || 1,
-    rpts: prod.retailerPoints,
-    mpts: prod.mechanicPoints,
-    serial: `S-${Math.floor(100000 + Math.random() * 900000)}`
-  };
+  // Use the fixed QR code value already stored in the Products sheet, so the
+  // same sticker always encodes the same code (needed so scans can be matched
+  // back to a specific product/batch and duplicate-detected). Only fall back
+  // to a generated code if the product has never had one set.
+  const storedQrCode = (prod.qrCode || "").trim();
+  const qrContent = storedQrCode || `STICKER-${prod.itemCode || prod.id}`;
+  if (!storedQrCode) {
+    window.UTILS.showToast(`No saved QR code found for this product — using a generated fallback (${qrContent}). Set one in the product's "QR Code" field to make it permanent.`, "warning");
+  }
 
-  const payloadStr = JSON.stringify(payload);
   const container = document.getElementById("qr-canvas-container");
   if (container) {
     container.innerHTML = "";
-    const qr = qrcode(0, 'M');
-    qr.addData(payloadStr);
-    qr.make();
-    container.innerHTML = qr.createSvgTag(2.5, 1);
+    try {
+      if (typeof qrcode !== "function") {
+        throw new Error("QR code library (qrcode-generator) did not load. Check your internet connection or any ad-blocker/extension that may be blocking cdn.jsdelivr.net, then refresh the page.");
+      }
+      const qr = qrcode(0, 'M');
+      qr.addData(qrContent);
+      qr.make();
+      container.innerHTML = qr.createSvgTag(2.5, 1);
+    } catch (qrGenErr) {
+      console.error("QR code generation failed", qrGenErr);
+      container.innerHTML = `<div class="text-[10px] text-rose-600 font-mono p-2 text-center">QR generation failed:<br>${qrGenErr.message}</div>`;
+      window.UTILS.showToast("QR code failed to generate: " + qrGenErr.message, "error");
+    }
   }
 
   // Adjust display visibility
