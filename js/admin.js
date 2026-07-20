@@ -1301,8 +1301,7 @@ function downloadQrSticker() {
       // Footnotes
       ctx.font = "bold 10px monospace";
       ctx.fillText("SCRATCH & SCAN INSIDE PORTAL TO ACTIVATE POINTS", 25, 270);
-      ctx.font = "9px monospace";
-      ctx.fillText(`Retailer: ${activeGeneratedProduct.retailerPoints} Pts | Mechanic: ${activeGeneratedProduct.mechanicPoints} Pts`, 25, 290);
+      
 
       // Save
       const link = document.createElement("a");
@@ -1464,8 +1463,7 @@ function generateStickerBlobForProduct(prod) {
 
         ctx.font = "bold 10px monospace";
         ctx.fillText("SCRATCH & SCAN INSIDE PORTAL TO ACTIVATE POINTS", 25, 270);
-        ctx.font = "9px monospace";
-        ctx.fillText(`Retailer: ${prod.retailerPoints || 0} Pts | Mechanic: ${prod.mechanicPoints || 0} Pts`, 25, 290);
+        
 
         URLObj.revokeObjectURL(blobURL);
         canvas.toBlob((blob) => {
@@ -1657,7 +1655,7 @@ function downloadMemberQrCard() {
   // Title text
   ctx.fillStyle = "#0f172a";
   ctx.font = "black 24px sans-serif";
-  ctx.fillText("VIKAS AUTOMOBILES", 35, 65);
+  ctx.fillText("VIKAS AUTOMOBILES, SATNA (HP LUBE DISTRIBUTOR)", 35, 65);
   
   ctx.fillStyle = t.accent;
   ctx.font = "bold 11px monospace";
