@@ -1266,7 +1266,7 @@ function downloadQrSticker() {
   ctx.fillRect(5, 5, canvas.width - 10, 40);
   ctx.fillStyle = t.headerText;
   ctx.font = "bold 15px sans-serif";
-  ctx.fillText("VIKAS AUTO GENUINE PART", 20, 30);
+  ctx.fillText("VIKAS AUTOMOBILES , SATNA (HP LUBE DISTRIBUTOR)", 20, 30);
 
   // Product metadata lines
   ctx.fillStyle = "#000000";
@@ -1276,10 +1276,7 @@ function downloadQrSticker() {
   ctx.font = "11px monospace";
   ctx.fillText(`PART SKU: ${activeGeneratedProduct.id}`, 20, 115);
   ctx.fillText(`BRAND: ${activeGeneratedProduct.brand}`, 20, 135);
-  ctx.fillText(`BATCH: ${document.getElementById("qr-batch").value}`, 20, 155);
   ctx.fillText(`NET QTY: ${activeGeneratedProduct.packSize}`, 20, 175);
-  ctx.fillText(`MRP: Rs. ${activeGeneratedProduct.mrp}.00 (All taxes incl.)`, 20, 195);
-  ctx.fillText(`MFG DATE: ${document.getElementById("qr-mfg-date").value}`, 20, 215);
 
   // Draw QR code path
   const qrSvg = document.querySelector("#qr-canvas-container svg");
@@ -1443,7 +1440,7 @@ function generateStickerBlobForProduct(prod) {
       ctx.fillRect(5, 5, canvas.width - 10, 40);
       ctx.fillStyle = t.headerText;
       ctx.font = "bold 15px sans-serif";
-      ctx.fillText("VIKAS AUTO GENUINE PART", 20, 30);
+      ctx.fillText("VIKAS AUTOMOBILES, SATNA (HP LUBE DISTRIBUTOR)", 20, 30);
 
       ctx.fillStyle = "#000000";
       ctx.font = "bold 14px sans-serif";
@@ -1452,11 +1449,8 @@ function generateStickerBlobForProduct(prod) {
       ctx.font = "11px monospace";
       ctx.fillText(`PART SKU: ${prod.id}`, 20, 115);
       ctx.fillText(`BRAND: ${prod.brand || "Vikas Spares"}`, 20, 135);
-      ctx.fillText(`BATCH: B-2026-07`, 20, 155);
       ctx.fillText(`NET QTY: ${prod.packSize || "1 Unit"}`, 20, 175);
-      ctx.fillText(`MRP: Rs. ${prod.mrp || 0}.00 (All taxes incl.)`, 20, 195);
-      ctx.fillText(`MFG DATE: ${new Date().toISOString().split("T")[0]}`, 20, 215);
-
+     
       const img = new Image();
       img.onload = function() {
         ctx.drawImage(img, canvas.width - 165, 80, 140, 140);
