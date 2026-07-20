@@ -1165,15 +1165,28 @@ function generateProductQrGraphic() {
   const customBatch = document.getElementById("qr-batch").value || "B-2026-07";
 
   // Render sticker card elements
-  document.getElementById("label-prod-id").innerText = prod.id;
-  document.getElementById("label-prod-name").innerText = customName;
-  document.getElementById("label-brand").innerText = `Brand: ${prod.brand || "Vikas Spares"}`;
-  document.getElementById("label-batch").innerText = `Batch: ${customBatch}`;
-  document.getElementById("label-pack").innerText = `Size: ${customPack}`;
-  document.getElementById("label-qty").innerText = `Qty: ${customQty}`;
-  
+  // Use a null-safe setter: if any single label element is missing from the
+  // DOM (e.g. a stale cached page build), that must NOT stop the function —
+  // it should still fall through and generate the actual QR code below,
+  // which is the part that actually matters.
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerText = text;
+    } else {
+      console.warn(`Sticker label element #${id} not found in the DOM — skipping. If this persists, hard-refresh the page (Ctrl+Shift+R) to clear any cached HTML.`);
+    }
+  }
+
+  setText("label-prod-id", prod.id);
+  setText("label-prod-name", customName);
+  setText("label-brand", `Brand: ${prod.brand || "Vikas Spares"}`);
+  setText("label-batch", `Batch: ${customBatch}`);
+  setText("label-pack", `Size: ${customPack}`);
+  setText("label-qty", `Qty: ${customQty}`);
+
   const mfgVal = document.getElementById("qr-mfg-date").value;
-  document.getElementById("label-mfg").innerText = `MFG: ${mfgVal ? window.UTILS.formatDate(new Date(mfgVal).toISOString()) : "03-Jul-2026"}`;
+  setText("label-mfg", `MFG: ${mfgVal ? window.UTILS.formatDate(new Date(mfgVal).toISOString()) : "03-Jul-2026"}`);
 
   // Remember exactly what was used to generate this sticker, so "Edit Sticker" can restore it
   activeStickerMeta = { customName, customPack, customQty, customBatch, mfgVal };
@@ -1207,14 +1220,17 @@ function generateProductQrGraphic() {
   }
 
   // Adjust display visibility
-  document.getElementById("qr-empty-state").classList.add("hidden");
-  document.getElementById("sticker-label").classList.remove("hidden");
-  document.getElementById("qr-actions-panel").classList.remove("hidden");
+  const emptyStateEl = document.getElementById("qr-empty-state");
+  const stickerLabelEl = document.getElementById("sticker-label");
+  const actionsPanelEl = document.getElementById("qr-actions-panel");
+  if (emptyStateEl) emptyStateEl.classList.add("hidden");
+  if (stickerLabelEl) stickerLabelEl.classList.remove("hidden");
+  if (actionsPanelEl) actionsPanelEl.classList.remove("hidden");
 
   // Apply the currently selected sticker format (colors/border/QR frame)
   window.UTILS.applyStickerTemplateStyle();
 
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
   window.UTILS.showToast(`Sticker generated for ${customName}!`, "success");
 }
 
