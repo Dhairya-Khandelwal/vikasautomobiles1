@@ -1195,7 +1195,7 @@ function generateProductQrGraphic() {
   // same sticker always encodes the same code (needed so scans can be matched
   // back to a specific product/batch and duplicate-detected). Only fall back
   // to a generated code if the product has never had one set.
-  const storedQrCode = (prod.qrCode || "").trim();
+  const storedQrCode = String(prod.qrCode || "").trim();
   const qrContent = storedQrCode || `STICKER-${prod.itemCode || prod.id}`;
   if (!storedQrCode) {
     window.UTILS.showToast(`No saved QR code found for this product — using a generated fallback (${qrContent}). Set one in the product's "QR Code" field to make it permanent.`, "warning");
