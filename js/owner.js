@@ -316,12 +316,12 @@ async function loadApprovals() {
         <i data-lucide="edit" class="w-3.5 h-3.5"></i> Edit
       </button>`;
 
-      return `
-        <tr class="border-b border-slate-800/40 text-xs">
-          <td class="py-3 pr-3 font-bold text-white font-sans">${u.fullname}<br><span class="text-[9px] text-slate-500 font-mono">${window.UTILS.displayEmail(u.email)}</span></td>
-          <td class="py-3 capitalize font-bold text-slate-300 font-mono text-[10px]">${u.role}</td>
-          <td class="py-3 font-semibold text-slate-300 font-sans">${u.firmName || "-"}</td>
-          <td class="py-3 text-slate-400 font-mono text-[10px]">${u.pincode || "-"}</td>
+     return `
+        <tr class="border-b border-slate-100 text-xs">
+          <td class="py-3 pr-3 font-bold text-slate-800 font-sans">${u.fullname}<br><span class="text-[9px] text-slate-400 font-mono">${window.UTILS.displayEmail(u.email)}</span></td>
+          <td class="py-3 capitalize font-bold text-slate-600 font-mono text-[10px]">${u.role}</td>
+          <td class="py-3 font-semibold text-slate-600 font-sans">${u.firmName || "-"}</td>
+          <td class="py-3 text-slate-500 font-mono text-[10px]">${u.pincode || "-"}</td>
           <td class="py-3">
             <span class="px-2 py-0.5 border text-[9px] font-bold rounded uppercase font-mono ${statusColor}">${u.status}</span>
           </td>
