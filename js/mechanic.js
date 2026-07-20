@@ -388,6 +388,29 @@ async function submitManualLoyaltyScanClaim() {
     };
 
     await window.API.submitPurchaseClaim(claim);
+
+    // Also log a QR claim record for the admin verification/diagnosis panel.
+    // This is purely an audit/fraud-check trail — it does NOT award points;
+    // points are already handled above via submitPurchaseClaim.
+    try {
+      await window.API.saveQrClaim({
+        qrCode: prod.qrCode || `STICKER-${prod.itemCode || prod.id}`,
+        itemCode: prod.itemCode || "",
+        productName: prod.name,
+        userName: currentMechanicSession.fullname,
+        email: currentMechanicSession.email,
+        role: currentMechanicSession.role,
+        firmName: currentMechanicSession.firmName,
+        quantity: qty,
+        points: pointsCalculated,
+        status: "Pending",
+        remarks: ""
+      });
+    } catch (qrErr) {
+      // Non-fatal: the purchase claim (which drives points) already succeeded.
+      console.error("Failed to log QR claim record", qrErr);
+    }
+
     window.UTILS.showToast("Purchase request submitted successfully! Awaiting approval.", "success");
     
     // Clear
