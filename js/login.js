@@ -395,15 +395,7 @@ async function handleOtpVerification(event) {
     return false;
   }
 
-window.UTILS.showLoader("Verifying you're human...");
-const captchaCheck = await window.API.request("verify_captcha", { captchaToken });
-if (!captchaCheck.success) {
-  window.UTILS.hideLoader();
-  window.UTILS.showToast("Verification failed. Please try again.", "error");
-  renderLoginCaptcha();
-  return false;
-}
-// existing establishSession(...) call continues here
+sting establishSession(...) call continues here
 
 
 
