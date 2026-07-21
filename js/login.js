@@ -395,10 +395,6 @@ async function handleOtpVerification(event) {
     return false;
   }
 
-sting establishSession(...) call continues here
-
-
-
   
   window.UTILS.showLoader("Establishing secure session...");
 
