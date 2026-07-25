@@ -845,6 +845,9 @@ const API = {
 
   // === 11. REWARDS CATALOGUE & REDEMPTION API ===
   getRewards: async () => {
+    if (API.isRealBackend()) {
+      return (await API.request("get_rewards")).data;
+    }
     const storageKey = window.CONFIG.STORAGE_KEYS.REWARDS;
     const neverInitialized = localStorage.getItem(storageKey) === null;
     let rewards = window.UTILS.getLocal(storageKey);
@@ -857,6 +860,9 @@ const API = {
   },
 
   saveReward: async (reward) => {
+    if (API.isRealBackend()) {
+      return await API.request("save_reward", { reward });
+    }
     const rewards = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.REWARDS);
     const index = rewards.findIndex(r => r.id === reward.id);
     if (index !== -1) {
@@ -871,6 +877,9 @@ const API = {
   },
 
   deleteReward: async (id) => {
+    if (API.isRealBackend()) {
+      return await API.request("delete_reward", { id });
+    }
     const rewards = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.REWARDS);
     const filtered = rewards.filter(r => r.id !== id);
     window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.REWARDS, filtered);
@@ -879,6 +888,9 @@ const API = {
   },
 
   getRedemptions: async () => {
+    if (API.isRealBackend()) {
+      return (await API.request("get_redemptions")).data;
+    }
     const storageKey = window.CONFIG.STORAGE_KEYS.REDEMPTIONS;
     const neverInitialized = localStorage.getItem(storageKey) === null;
     let redemptions = window.UTILS.getLocal(storageKey);
@@ -904,6 +916,13 @@ const API = {
   },
 
   submitRedemption: async (email, fullname, role, firmName, rewardId, rewardName, pointsRequired) => {
+    if (API.isRealBackend()) {
+      const result = await API.request("submit_redemption", {
+        redemption: { email, fullname, role, firmName, rewardId, rewardName, pointsRequired }
+      });
+      await API.addNotification(email, "Redemption Submitted", `Your redemption request for ${rewardName} (${pointsRequired} Pts) has been submitted successfully and is pending approval.`, "reward_redemption");
+      return result;
+    }
     const redemptions = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.REDEMPTIONS) || [];
     const rewards = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.REWARDS);
     const rIdx = rewards.findIndex(r => r.id === rewardId);
@@ -935,6 +954,9 @@ const API = {
   },
 
   processRedemption: async (redemptionId, status, remark = "") => {
+    if (API.isRealBackend()) {
+      return await API.request("process_redemption", { redemptionId, status, remark });
+    }
     const redemptions = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.REDEMPTIONS) || [];
     const idx = redemptions.findIndex(r => r.id === redemptionId);
     if (idx === -1) {
