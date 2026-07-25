@@ -756,7 +756,17 @@ function openWebcamScanner() {
         } catch (e) {}
         
         const list = productsList.length > 0 ? productsList : window.CONFIG.DEFAULT_PRODUCTS;
-        const found = list.find(p => p.id.toLowerCase() === prodId.toLowerCase() || p.name.toLowerCase() === prodId.toLowerCase());
+        const needle = prodId.toLowerCase();
+        const found = list.find(p => {
+          const candidates = [
+            p.id,
+            p.name,
+            p.qrCode,
+            p.itemCode,
+            `STICKER-${p.itemCode || p.id}`
+          ].filter(Boolean).map(v => String(v).toLowerCase());
+          return candidates.includes(needle);
+        });
         
         if (found) {
           document.getElementById("scan-select-product").value = found.id;
