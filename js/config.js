@@ -2,7 +2,7 @@
 
 const CONFIG = {
   // Google Apps Script Web App Endpoint URL (Will fallback to stateful local db if empty)
-  API_URL: "https://script.google.com/macros/s/AKfycbxf3C5rhJIiYlYnIF2UC43ryvn2gLzMGFB-VImypXcgNE8reEES_ECeWDPM88DxgCmrIA/exec", 
+  API_URL: "https://script.google.com/macros/s/AKfycbwbtTtmeMVIAbiZ0qkAHjb6U30EuonLKdLfMtmyGnGBNbLcqOE-e-TOAwLqjSWvhKlG/exec", 
 
   // Google reCAPTCHA v2 ("I'm not a robot") site key used as the login verification step.
   // This ships with Google's official PUBLIC TEST key, which always validates successfully
