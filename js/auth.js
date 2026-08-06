@@ -65,6 +65,8 @@ const AUTH = {
     console.log("Typed password:", JSON.stringify(password));
     console.log("isMobileInput:", isMobileInput);
     console.log("Total users returned from backend:", users.length);
+    console.log("Raw first user object:", users[0]);
+    console.log("Actual property/key names on that object:", users[0] ? Object.keys(users[0]) : "(no users)");
     console.table(users.map(u => ({
       fullname: u.fullname,
       email: u.email,
