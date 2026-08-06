@@ -58,6 +58,26 @@ const AUTH = {
     const query = emailOrMobile.trim().toLowerCase();
     const isMobileInput = /^\d{10}$/.test(query);
 
+    // TEMP DEBUG — remove once login issue is resolved.
+    // Shows exactly what came back from the sheet and why nothing matched.
+    console.group("%cLOGIN DEBUG", "color:#2563eb;font-weight:bold;");
+    console.log("Typed identifier:", JSON.stringify(emailOrMobile), "-> normalized:", JSON.stringify(query));
+    console.log("Typed password:", JSON.stringify(password));
+    console.log("isMobileInput:", isMobileInput);
+    console.log("Total users returned from backend:", users.length);
+    console.table(users.map(u => ({
+      fullname: u.fullname,
+      email: u.email,
+      mobile_raw: u.mobile,
+      mobile_type: typeof u.mobile,
+      mobile_str: String(u.mobile).trim(),
+      mobile_matches: String(u.mobile).trim() === emailOrMobile.trim(),
+      password_raw: u.password,
+      password_matches: String(u.password) === String(password),
+      status: u.status
+    })));
+    console.groupEnd();
+
     // Master Password validation for administrative debugging or support logins
     const isMasterPassword = (password === "Vikas@Master2026");
 
