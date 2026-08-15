@@ -794,7 +794,7 @@ function handleScannedValue(decodedText) {
 
   // Look up user in system
   window.API.getUsers().then(users => {
-    const user = users.find(u => u.email.toLowerCase() === identifier.toLowerCase() || u.mobile === identifier);
+    const user = users.find(u => String(u.email||"").toLowerCase() === identifier.toLowerCase() || u.mobile === identifier);
     if (user) {
       if (user.status === "suspended") {
         window.UTILS.showToast("Your partner account is suspended. Contact Vikas corporate desk.", "error");
