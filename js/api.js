@@ -271,7 +271,7 @@ const API = {
     userData = { ...userData, email };
 
     // Avoid duplicates
-    if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+    if (users.find(u => String(u.email||"").toLowerCase() === email.toLowerCase())) {
       throw new Error("This email address is already registered.");
     }
     if (users.find(u => u.mobile === userData.mobile)) {
@@ -307,7 +307,7 @@ const API = {
       return await API.request("update_user_status", { email, status });
     }
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
-    const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+    const userIndex = users.findIndex(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (userIndex !== -1) {
       users[userIndex].status = status;
       window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.USERS, users);
@@ -319,11 +319,11 @@ const API = {
 
   updateUserProfile: async (email, updatedData) => {
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
-    const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+    const userIndex = users.findIndex(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (userIndex !== -1) {
       // Check if email is being changed and if new email already exists
-      if (updatedData.email && updatedData.email.toLowerCase() !== email.toLowerCase()) {
-        const emailExists = users.some(u => u.email.toLowerCase() === updatedData.email.toLowerCase());
+      if (updatedData.email && String(updatedData.email||"").toLowerCase() !== email.toLowerCase()) {
+        const emailExists = users.some(u => String(u.email||"").toLowerCase() === String(updatedData.email||"").toLowerCase());
         if (emailExists) {
           throw new Error("The new email address is already registered by another user.");
         }
@@ -334,7 +334,7 @@ const API = {
       
       // Update session if it's the current user
       const currentSession = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.SESSION, null);
-      if (currentSession && currentSession.email.toLowerCase() === email.toLowerCase()) {
+      if (currentSession && String(currentSession.email||"").toLowerCase() === email.toLowerCase()) {
         const newSession = { ...currentSession, ...updatedData };
         window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.SESSION, newSession);
       }
@@ -346,14 +346,14 @@ const API = {
 
   updateUserPoints: async (email, pointsDelta) => {
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
-    const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+    const userIndex = users.findIndex(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (userIndex !== -1) {
       users[userIndex].points = Math.max(0, (users[userIndex].points || 0) + pointsDelta);
       window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.USERS, users);
       
       // Update session if it's the current user
       const currentSession = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.SESSION, null);
-      if (currentSession && currentSession.email.toLowerCase() === email.toLowerCase()) {
+      if (currentSession && String(currentSession.email||"").toLowerCase() === email.toLowerCase()) {
         currentSession.points = users[userIndex].points;
         window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.SESSION, currentSession);
       }
@@ -367,11 +367,11 @@ const API = {
       return await API.request("delete_user", { email });
     }
     let users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = users.find(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (!user) {
       throw new Error("User profile not found.");
     }
-    users = users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+    users = users.filter(u => String(u.email||"").toLowerCase() !== email.toLowerCase());
     window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.USERS, users);
     await API.addLog("USER_DEL", `User account permanently deleted: ${user.fullname} (${email}) [Role: ${user.role.toUpperCase()}]`, "USERS");
     return { success: true };
@@ -382,7 +382,7 @@ const API = {
       return await API.request("force_reset_password", { email, newPassword });
     }
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
-    const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+    const userIndex = users.findIndex(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (userIndex !== -1) {
       users[userIndex].password = newPassword;
       window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.USERS, users);
@@ -685,7 +685,7 @@ const API = {
     const logs = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.OTP_LOGS) || [];
     const q = emailOrMobile.trim().toLowerCase();
     const logIndex = logs.findIndex(l => 
-      (l.email.toLowerCase() === q || l.mobile === q) && l.status === "sent"
+      (String(l.email||"").toLowerCase() === q || l.mobile === q) && l.status === "sent"
     );
     if (logIndex !== -1) {
       logs[logIndex].status = status;
@@ -762,7 +762,7 @@ const API = {
   updateUserPointsByEmailOrName: async (emailOrName, pointsDelta) => {
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS) || [];
     const q = emailOrName.trim().toLowerCase();
-    const user = users.find(u => u.email.toLowerCase() === q || u.fullname.toLowerCase() === q);
+    const user = users.find(u => String(u.email||"").toLowerCase() === q || String(u.fullname||"").toLowerCase() === q);
     if (user) {
       user.points = Math.max(0, (user.points || 0) + pointsDelta);
       window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.USERS, users);
@@ -978,7 +978,7 @@ const API = {
     if (status === "approved") {
       // Deduct points
       const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
-      const uIdx = users.findIndex(u => u.email.toLowerCase() === rdm.email.toLowerCase());
+      const uIdx = users.findIndex(u => String(u.email||"").toLowerCase() === String(rdm.email||"").toLowerCase());
       if (uIdx !== -1) {
         if (users[uIdx].points < rdm.pointsRequired) {
           throw new Error(`Insufficient point balance! User has ${users[uIdx].points} Pts, requires ${rdm.pointsRequired} Pts.`);
@@ -1058,7 +1058,7 @@ const API = {
 
   setUserSuspendedState: async (email, isSuspended) => {
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
-    const idx = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+    const idx = users.findIndex(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (idx !== -1) {
       users[idx].status = isSuspended ? "suspended" : "approved";
       window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.USERS, users);
