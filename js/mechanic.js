@@ -76,8 +76,19 @@ async function loadMechanicDashboard() {
     document.getElementById("dash-points-pending").innerText = pendingClaims;
     document.getElementById("dash-points-total").innerText = totalPointsEarned;
 
-    // Render Milestone Rewards Center
-    renderMilestoneRewards(currentMechanicSession.points || 0);
+    // Update the dashboard "Current Tier" card
+    const dashPoints = currentMechanicSession.points || 0;
+    const dashTier = getCustomerTier(dashPoints);
+    const dashTierName = document.getElementById("dash-tier-name");
+    const dashTierPoints = document.getElementById("dash-tier-points");
+    const dashTierIcon = document.getElementById("dash-tier-icon");
+    if (dashTierName) dashTierName.innerText = dashTier.name.toUpperCase();
+    if (dashTierPoints) dashTierPoints.innerText = dashPoints + " Pts accumulated";
+    if (dashTierIcon) {
+      dashTierIcon.className = `inline-flex p-3 rounded-full mb-1 ${dashTier.cardClass}`;
+      dashTierIcon.innerHTML = `<i data-lucide="${dashTier.icon}" class="w-8 h-8"></i>`;
+      if (window.lucide) window.lucide.createIcons();
+    }
 
     // Load active announcements
     await window.NOTIFICATIONS.renderDashboardAnnouncements("partner-notices-feed", "mechanic");
@@ -695,23 +706,14 @@ async function initMechanicPage() {
       document.getElementById("sidebar-avatar").src = currentMechanicSession.photo;
     }
 
-    // Set custom tier text
+    // Set custom tier text based on accumulated points
     const points = currentMechanicSession.points || 0;
-    let tierText = "BRONZE MEMBER";
-    let tierClass = "text-slate-500 font-mono";
-
-    if (points >= 15000) {
-      tierText = "PLATINUM LEGEND GARAGE";
-      tierClass = "text-blue-500 font-mono font-bold tracking-widest animate-pulse";
-    } else if (points >= 5000) {
-      tierText = "GOLD VALUE WORKSHOP";
-      tierClass = "text-amber-400 font-mono font-bold tracking-widest";
-    }
+    const sidebarTier = getCustomerTier(points);
 
     const tierLabel = document.getElementById("sidebar-tier");
     if (tierLabel) {
-      tierLabel.innerText = tierText;
-      tierLabel.className = `text-[9px] ${tierClass} uppercase tracking-wider block`;
+      tierLabel.innerText = sidebarTier.name.toUpperCase();
+      tierLabel.className = `text-[9px] ${sidebarTier.badgeClass} uppercase tracking-wider block`;
     }
 
     await loadMechanicDashboard();
@@ -889,142 +891,28 @@ async function saveProfileSettings(event) {
   }
 }
 
-function renderMilestoneRewards(points) {
-  const userPointsElem = document.getElementById("milestones-user-points");
-  if (userPointsElem) userPointsElem.innerText = points + " Pts";
+// Shared 5-tier customer classification, based on lifetime points.
+// Bump these thresholds any time — nothing else needs to change.
+const CUSTOMER_TIERS = [
+  { min: 0,     name: "Bronze Customer",  icon: "shield",  badgeClass: "text-slate-500 font-mono",                      cardClass: "bg-slate-50 text-slate-500" },
+  { min: 1000,  name: "Silver Customer",  icon: "medal",   badgeClass: "text-blue-400 font-mono font-bold tracking-widest",  cardClass: "bg-blue-50 text-blue-500" },
+  { min: 2500,  name: "Gold Customer",    icon: "trophy",  badgeClass: "text-amber-400 font-mono font-bold tracking-widest", cardClass: "bg-amber-50 text-amber-500" },
+  { min: 5000,  name: "Diamond Customer", icon: "gem",     badgeClass: "text-cyan-400 font-mono font-bold tracking-widest",  cardClass: "bg-cyan-50 text-cyan-500" },
+  { min: 10000, name: "Star Customer",    icon: "star",    badgeClass: "text-rose-400 font-mono font-bold tracking-widest",  cardClass: "bg-rose-50 text-rose-500" }
+];
 
-  const milestonesList = [
-    { pts: 1000, name: "Silver Star Overall Kit", item: "👕 HP Work Dungaree & Cap", desc: "Premium quality durable work overalls for your workshop.", icon: "shirt" },
-    { pts: 2500, name: "Gold Toolset Set", item: "🔧 Professional Socket Wrench Kit", desc: "46-piece vanadium tool set with high-grade ratcheting wrenches.", icon: "wrench" },
-    { pts: 5000, name: "Platinum Safety Combo", item: "🥾 Steel-Toe Boots & Safety Jacket", desc: "ISO-certified steel-toe slip-resistant boots and reflective jacket.", icon: "shield" },
-    { pts: 10000, name: "Supernova Diagnostics", item: "📱 OBD2 Bluetooth Smart Scanner", desc: "Advanced vehicle health diagnostics scanning tablet.", icon: "smartphone" },
-    { pts: 25000, name: "Vikas VIP Legend Trolley", item: "🧰 Full Master Garage Steel Cabinet", desc: "Rolling tool storage cabinet loaded with heavy-duty tools.", icon: "box" }
-  ];
-
-  // Calculate progress percent based on 25,000 points max milestone
-  const percent = Math.min(100, Math.round((points / 25000) * 100));
-  const progressBar = document.getElementById("milestones-progress-bar");
-  if (progressBar) progressBar.style.width = percent + "%";
-
-  // Find next milestone
-  const nextMilestone = milestonesList.find(m => points < m.pts);
-  const nextText = document.getElementById("milestones-next-text");
-  if (nextText) {
-    if (nextMilestone) {
-      const remaining = nextMilestone.pts - points;
-      nextText.innerText = `${nextMilestone.name} (${remaining} Pts needed)`;
-    } else {
-      nextText.innerText = "⭐ VIKAS ROYAL LEGEND (All Milestones Cleared!)";
-    }
+function getCustomerTier(points) {
+  let tier = CUSTOMER_TIERS[0];
+  for (const t of CUSTOMER_TIERS) {
+    if (points >= t.min) tier = t;
   }
-
-  const grid = document.getElementById("milestones-grid");
-  if (!grid) return;
-
-  grid.innerHTML = milestonesList.map(m => {
-    const isUnlocked = points >= m.pts;
-    const progressPercent = Math.min(100, Math.round((points / m.pts) * 100));
-    const btnClass = isUnlocked 
-      ? "bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white cursor-pointer" 
-      : "bg-slate-100 text-slate-400 cursor-not-allowed";
-    const btnText = isUnlocked ? "Redeem Gift!" : "Locked";
-    const borderClass = isUnlocked ? "border-rose-200 bg-rose-50/25" : "border-slate-100 bg-white";
-    const iconColor = isUnlocked ? "text-rose-600" : "text-slate-300";
-
-    return `
-      <div class="border ${borderClass} shadow-sm rounded-xl p-4 flex flex-col justify-between transition hover:shadow-md">
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-[9px] font-mono font-bold tracking-wider ${isUnlocked ? 'text-rose-600' : 'text-slate-400'}">${m.pts} PTS</span>
-            <div class="p-1 rounded-lg ${isUnlocked ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-400'}">
-              <i data-lucide="${m.icon}" class="w-3.5 h-3.5"></i>
-            </div>
-          </div>
-          <div class="space-y-1">
-            <h4 class="font-bold text-slate-800 text-[11px] leading-tight">${m.name}</h4>
-            <span class="text-[9px] text-blue-600 font-extrabold block leading-none">${m.item}</span>
-            <p class="text-[10px] text-slate-400 leading-snug font-medium pt-1">${m.desc}</p>
-          </div>
-        </div>
-        
-        <div class="mt-4 pt-3 border-t border-slate-100 space-y-2.5">
-          ${!isUnlocked ? `
-            <div class="space-y-1">
-              <div class="flex justify-between text-[8px] font-mono font-bold text-slate-400">
-                <span>Unlock Progress</span>
-                <span>${progressPercent}%</span>
-              </div>
-              <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-500" style="width: ${progressPercent}%"></div>
-              </div>
-            </div>
-          ` : `
-            <div class="flex items-center gap-1 text-[8.5px] font-bold text-emerald-600">
-              <i data-lucide="check-circle" class="w-3 h-3"></i>
-              <span>Milestone Unlocked!</span>
-            </div>
-          `}
-          <button onclick="claimMilestoneReward('${m.name}', ${m.pts})" ${!isUnlocked ? 'disabled' : ''} 
-            class="w-full py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wide transition flex items-center justify-center gap-1 ${btnClass}">
-            <i data-lucide="${isUnlocked ? 'gift' : 'lock'}" class="w-3 h-3"></i>
-            <span>${btnText}</span>
-          </button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
-}
-
-async function claimMilestoneReward(name, pointsRequired) {
-  if ((currentMechanicSession.points || 0) < pointsRequired) {
-    window.UTILS.showToast("Insufficient wallet points to claim this milestone gift.", "error");
-    return;
-  }
-
-  const confirmed = confirm(`Are you sure you want to redeem your points to claim "${name}" (${pointsRequired} Pts)? This will deduct ${pointsRequired} points from your wallet.`);
-  if (!confirmed) return;
-
-  window.UTILS.showLoader("Transmitting gift claim request...");
-  try {
-    // Deduct points
-    await window.API.updateUserPoints(currentMechanicSession.email, -pointsRequired);
-
-    // Log claim to purchases ledger
-    const claim = {
-      email: currentMechanicSession.email,
-      fullname: currentMechanicSession.fullname,
-      role: currentMechanicSession.role,
-      firmName: currentMechanicSession.firmName,
-      productID: "RED-GIFT",
-      productName: `Milestone Reward Unlocked: ${name}`,
-      quantity: 1,
-      pointsCalculated: -pointsRequired
-    };
-
-    await window.API.submitPurchaseClaim(claim);
-    window.UTILS.showToast(`Congratulations! Claim for ${name} submitted successfully! Vikas Automobiles staff will contact you to dispatch your reward shortly.`, "success");
-
-    await loadMechanicDashboard();
-    
-    // Log system activity
-    await window.API.logAction(currentMechanicSession.fullname, "Redeemed Milestone Reward", "mechanic", `User redeemed ${pointsRequired} pts for ${name}`);
-  } catch (ex) {
-    window.UTILS.showToast(ex.message, "error");
-  } finally {
-    window.UTILS.hideLoader();
-  }
+  return tier;
 }
 
 window.openProfileSettingsModal = openProfileSettingsModal;
 window.closeProfileSettingsModal = closeProfileSettingsModal;
 window.setPresetProfileAvatar = setPresetProfileAvatar;
 window.saveProfileSettings = saveProfileSettings;
-window.claimMilestoneReward = claimMilestoneReward;
-window.renderMilestoneRewards = renderMilestoneRewards;
 
 // Setup profile photo live preview
 document.addEventListener("DOMContentLoaded", () => {
