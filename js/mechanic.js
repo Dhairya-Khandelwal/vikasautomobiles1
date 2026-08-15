@@ -61,13 +61,13 @@ async function loadMechanicDashboard() {
     ]);
 
     // Sync session
-    const updatedUser = users.find(u => u.email.toLowerCase() === currentMechanicSession.email.toLowerCase());
+    const updatedUser = users.find(u => String(u.email||"").toLowerCase() === String(currentMechanicSession.email||"").toLowerCase());
     if (updatedUser) {
       currentMechanicSession = updatedUser;
       window.AUTH.setCurrentSession(updatedUser);
     }
 
-    const userClaims = claims.filter(c => c.email.toLowerCase() === currentMechanicSession.email.toLowerCase());
+    const userClaims = claims.filter(c => String(c.email||"").toLowerCase() === String(currentMechanicSession.email||"").toLowerCase());
     const totalPointsEarned = userClaims.filter(c => c.status === "approved").reduce((sum, curr) => sum + (curr.pointsCalculated || 0), 0);
     const pendingClaims = userClaims.filter(c => c.status === "pending").length;
 
@@ -459,7 +459,7 @@ async function simulateCameraScanCapture() {
 async function loadLedgerStatement() {
   try {
     const claims = await window.API.getPurchases();
-    const userClaims = claims.filter(c => c.email.toLowerCase() === currentMechanicSession.email.toLowerCase());
+    const userClaims = claims.filter(c => String(c.email||"").toLowerCase() === String(currentMechanicSession.email||"").toLowerCase());
     const tbody = document.getElementById("ledger-tbody");
     if (!tbody) return;
 
@@ -590,7 +590,7 @@ async function loadRedemptions() {
     // 2. Fetch redemptions for current user
     const redemptions = await window.API.getRedemptions();
     const myRedemptions = redemptions.filter(r => 
-      r.email.toLowerCase() === currentMechanicSession.email.toLowerCase()
+      String(r.email||"").toLowerCase() === String(currentMechanicSession.email||"").toLowerCase()
     );
 
     const tbody = document.getElementById("redemptions-tbody");
