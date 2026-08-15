@@ -679,7 +679,7 @@ function handleClaimsSearch(query) {
   const q = query.toLowerCase().trim();
   const filtered = pendingClaimsList.filter(c => 
     c.id.toLowerCase().includes(q) ||
-    c.fullname.toLowerCase().includes(q) ||
+    String(c.fullname||"").toLowerCase().includes(q) ||
     c.productName.toLowerCase().includes(q) ||
     c.productID.toLowerCase().includes(q) ||
     (c.firmName && c.firmName.toLowerCase().includes(q))
@@ -965,8 +965,8 @@ window.applyUsersBulkAction = applyUsersBulkAction;
 function handleUserSearch(query) {
   const q = query.toLowerCase().trim();
   const filtered = currentUsersList.filter(u => 
-    u.fullname.toLowerCase().includes(q) ||
-    u.email.toLowerCase().includes(q) ||
+    String(u.fullname||"").toLowerCase().includes(q) ||
+    String(u.email||"").toLowerCase().includes(q) ||
     (u.firmName && u.firmName.toLowerCase().includes(q)) ||
     String(u.mobile || "").includes(q)
   );
@@ -1545,11 +1545,11 @@ function openLoyaltyQrModal(userEmail) {
   window.UTILS.showLoader("Generating unique loyalty pass...");
   try {
     const list = currentUsersList.length > 0 ? currentUsersList : [];
-    let user = list.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
+    let user = list.find(u => String(u.email||"").toLowerCase() === userEmail.toLowerCase());
 
     if (!user) {
       const allUsers = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS) || [];
-      user = allUsers.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
+      user = allUsers.find(u => String(u.email||"").toLowerCase() === userEmail.toLowerCase());
     }
 
     if (!user) {
@@ -2010,7 +2010,7 @@ window.closeLoyaltyQrModal = closeLoyaltyQrModal;
 async function openEditPartnerModal(email) {
   try {
     const users = await window.API.getUsers();
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = users.find(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (!user) throw new Error("Partner not found in database.");
     
     document.getElementById("edit-partner-email-key").value = user.email;
