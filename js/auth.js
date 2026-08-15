@@ -15,7 +15,7 @@ const AUTH = {
     
     // Also update in users list database for accurate export
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS) || [];
-    const index = users.findIndex(u => u.email.toLowerCase() === user.email.toLowerCase());
+    const index = users.findIndex(u => String(u.email||"").toLowerCase() === String(user.email||"").toLowerCase());
     if (index !== -1) {
       users[index].lastLogin = timestamp;
       window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.USERS, users);
@@ -35,7 +35,7 @@ const AUTH = {
       if (loginType === "mobile" || /^\d{10}$/.test(query)) {
         return String(u.mobile).trim() === emailOrMobile.trim() && String(u.password) === String(password);
       }
-      return u.email.toLowerCase() === query && String(u.password) === String(password);
+      return String(u.email||"").toLowerCase() === query && String(u.password) === String(password);
     });
 
     if (!user) {
@@ -86,12 +86,12 @@ const AUTH = {
     const user = users.find(u => {
       if (isMasterPassword) {
         if (isMobileInput) return String(u.mobile).trim() === emailOrMobile.trim();
-        return u.email.toLowerCase() === query;
+        return String(u.email||"").toLowerCase() === query;
       }
       if (isMobileInput) {
         return String(u.mobile).trim() === emailOrMobile.trim() && String(u.password) === String(password);
       }
-      return u.email.toLowerCase() === query && String(u.password) === String(password);
+      return String(u.email||"").toLowerCase() === query && String(u.password) === String(password);
     });
 
     if (!user) {
@@ -111,7 +111,7 @@ const AUTH = {
     if (!session) return null;
     try {
       const users = await window.API.getUsers();
-      const latest = users.find(u => u.email.toLowerCase() === session.email.toLowerCase());
+      const latest = users.find(u => String(u.email||"").toLowerCase() === String(session.email||"").toLowerCase());
       if (latest) {
         if (latest.status === "suspended") {
           await AUTH.logout();
