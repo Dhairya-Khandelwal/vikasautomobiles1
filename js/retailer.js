@@ -61,14 +61,15 @@ async function loadRetailerDashboard() {
     ]);
 
     // Refresh session data
-    const updatedUser = users.find(u => u.email.toLowerCase() === currentRetailerSession.email.toLowerCase());
+    const sessionEmail = String(currentRetailerSession.email || "").toLowerCase();
+    const updatedUser = users.find(u => String(u.email || "").toLowerCase() === sessionEmail);
     if (updatedUser) {
       currentRetailerSession = updatedUser;
       window.AUTH.setCurrentSession(updatedUser);
     }
 
     // Set Points metrics
-    const userClaims = claims.filter(c => c.email.toLowerCase() === currentRetailerSession.email.toLowerCase());
+    const userClaims = claims.filter(c => String(c.email || "").toLowerCase() === sessionEmail);
     const approvedClaims = userClaims.filter(c => c.status === "approved").length;
     const totalPointsEarned = userClaims.filter(c => c.status === "approved").reduce((sum, curr) => sum + (curr.pointsCalculated || 0), 0);
     const pendingClaims = userClaims.filter(c => c.status === "pending").length;
@@ -469,7 +470,7 @@ async function simulateCameraScanCapture() {
 async function loadLedgerStatement() {
   try {
     const claims = await window.API.getPurchases();
-    const userClaims = claims.filter(c => c.email.toLowerCase() === currentRetailerSession.email.toLowerCase());
+    const userClaims = claims.filter(c => String(c.email||"").toLowerCase() === String(currentRetailerSession.email||"").toLowerCase());
     const tbody = document.getElementById("ledger-tbody");
     if (!tbody) return;
 
@@ -601,7 +602,7 @@ async function loadRedemptions() {
     // 2. Fetch redemptions for current user
     const redemptions = await window.API.getRedemptions();
     const myRedemptions = redemptions.filter(r => 
-      r.email.toLowerCase() === currentRetailerSession.email.toLowerCase()
+      String(r.email||"").toLowerCase() === String(currentRetailerSession.email||"").toLowerCase()
     );
 
     const tbody = document.getElementById("redemptions-tbody");
