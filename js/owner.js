@@ -364,12 +364,12 @@ function openLoyaltyQrModal(userEmail) {
   window.UTILS.showLoader("Generating unique loyalty pass...");
   try {
     const list = currentPartnersList.length > 0 ? currentPartnersList : [];
-    let user = list.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
+    let user = list.find(u => String(u.email||"").toLowerCase() === userEmail.toLowerCase());
     
     // Fallback search inside direct seeded list if not loaded yet
     if (!user) {
       const allUsers = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS) || [];
-      user = allUsers.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
+      user = allUsers.find(u => String(u.email||"").toLowerCase() === userEmail.toLowerCase());
     }
 
     if (!user) {
@@ -953,7 +953,7 @@ window.printMemberQrCard = printMemberQrCard;
 async function openEditPartnerModal(email) {
   try {
     const users = await window.API.getUsers();
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = users.find(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (!user) throw new Error("Partner not found in database.");
     
     document.getElementById("edit-partner-email-key").value = user.email;
