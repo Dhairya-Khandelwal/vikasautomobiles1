@@ -592,7 +592,7 @@ async function loadRedemptions() {
         <option value="">-- Choose Reward --</option>
         ${activeRewardsList.map(r => `
           <option value="${r.id}" ${r.stock <= 0 ? 'disabled' : ''}>
-            ${r.name} (${r.pointsRequired} Pts) ${r.stock <= 0 ? '[OUT OF STOCK]' : `[Stock: ${r.stock}]`}
+            ${r.name} (${r.pointsRequired} Pts) ${r.stock <= 0 ? '[OUT OF STOCK]' : '[AVAILABLE]'}
           </option>
         `).join("")}
       `;
