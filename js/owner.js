@@ -1317,12 +1317,31 @@ window.handleDeleteOwnerClaim = handleDeleteOwnerClaim;
 window.processOwnerPurchaseClaim = processOwnerPurchaseClaim;
 
 // Set up photo live preview in edit partner modal
+function getSafeImagePreviewSrc(rawValue) {
+  const fallback = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop";
+  const value = (rawValue || "").trim();
+
+  if (!value) return fallback;
+  if (value.startsWith("data:image/")) return value;
+
+  try {
+    const parsed = new URL(value, window.location.origin);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.href;
+    }
+  } catch (_) {
+    // Ignore parse errors and use fallback below.
+  }
+
+  return fallback;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const editPhotoInput = document.getElementById("edit-partner-photo");
   if (editPhotoInput) {
     editPhotoInput.addEventListener("input", (e) => {
       const img = document.getElementById("edit-partner-preview");
-      if (img) img.src = e.target.value || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop";
+      if (img) img.src = getSafeImagePreviewSrc(e.target.value);
     });
   }
 });
