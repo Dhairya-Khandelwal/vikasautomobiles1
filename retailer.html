@@ -191,50 +191,22 @@
           </div>
         </div>
 
-        <!-- Exciting Milestone Rewards Center -->
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 space-y-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <!-- Rewards Center (PDF catalog) -->
+        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="inline-flex p-3 rounded-full bg-rose-50 text-rose-600 shrink-0">
+              <i data-lucide="gift" class="w-6 h-6"></i>
+            </div>
             <div>
-              <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-black uppercase tracking-wider rounded-md">New Scheme</span>
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                  <i data-lucide="gift" class="w-4.5 h-4.5 text-rose-500 animate-pulse"></i>
-                  <span>🔥 Exclusive Milestone & Point Rewards</span>
-                </h3>
-              </div>
-              <p class="text-[11px] text-slate-400 mt-1">Unlock prestigious bonus rewards, premium overalls, heavy-duty toolsets, and digital garage diagnostics as your lifetime points grow!</p>
-            </div>
-            <!-- Current points indicator -->
-            <div class="text-right shrink-0 bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-100/60 rounded-xl px-4 py-2 shadow-sm">
-              <span class="text-[9px] text-slate-400 font-mono uppercase font-black block">Your Points Wallet</span>
-              <span class="text-sm font-black text-rose-600 font-mono" id="milestones-user-points">0 Pts</span>
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">🔥 Exclusive Milestone & Point Rewards</h3>
+              <p class="text-[11px] text-slate-400 mt-1 max-w-md">Unlock prestigious bonus rewards, premium overalls, heavy-duty toolsets, and digital garage diagnostics as your lifetime points grow!</p>
             </div>
           </div>
-
-          <!-- Horizontal progress bar tracker -->
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
-            <div class="flex justify-between text-[10px] font-extrabold text-slate-600 font-mono uppercase">
-              <span>Next Reward Level</span>
-              <span id="milestones-next-text" class="text-blue-600">Loading your progress...</span>
-            </div>
-            <div class="relative w-full h-3 bg-slate-200 rounded-full overflow-hidden">
-              <div id="milestones-progress-bar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-rose-500 w-0 transition-all duration-500"></div>
-            </div>
-            <!-- Progress checkpoints markers -->
-            <div class="grid grid-cols-5 text-center text-[9px] font-mono font-bold text-slate-400 pt-1">
-              <div>1K Pts</div>
-              <div>2.5K Pts</div>
-              <div>5K Pts</div>
-              <div>10K Pts</div>
-              <div>25K Pts</div>
-            </div>
-          </div>
-
-          <!-- Milestones Cards Grid -->
-          <div id="milestones-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <!-- Loading indicator -->
-            <div class="col-span-full text-center py-4 text-xs font-mono text-slate-400">Loading exclusive rewards...</div>
-          </div>
+          <a href="assets/documents/rewards-catalog.pdf" target="_blank" rel="noopener"
+             class="shrink-0 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-5 py-3 rounded-xl transition-colors shadow-sm">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            View Rewards
+          </a>
         </div>
 
         <!-- Latest notices announcement -->
