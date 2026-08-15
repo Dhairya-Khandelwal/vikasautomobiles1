@@ -87,7 +87,7 @@ const EXPORTER = {
       const products = await window.API.getProducts();
 
       const mapped = purchases.map(c => {
-        const user = users.find(u => u.email.toLowerCase() === c.email.toLowerCase());
+        const user = users.find(u => String(u.email||"").toLowerCase() === String(c.email||"").toLowerCase());
         const prod = products.find(p => p.id === c.productID);
         
         let packSize = "-";
@@ -132,7 +132,7 @@ const EXPORTER = {
       const approved = purchases.filter(c => c.status === "approved" && c.productID !== "RED-CASH");
 
       const mapped = approved.map(c => {
-        const user = users.find(u => u.email.toLowerCase() === c.email.toLowerCase());
+        const user = users.find(u => String(u.email||"").toLowerCase() === String(c.email||"").toLowerCase());
         const prod = products.find(p => p.id === c.productID);
         
         let price = 0;
@@ -168,13 +168,13 @@ const EXPORTER = {
 
       const userTransactions = {};
       users.forEach(u => {
-        userTransactions[u.email.toLowerCase()] = [];
+        userTransactions[String(u.email||"").toLowerCase()] = [];
       });
 
       // Add credits (approved purchase claims)
       const credits = purchases.filter(c => c.status === "approved" && c.productID !== "RED-CASH");
       credits.forEach(c => {
-        const emailKey = c.email.toLowerCase();
+        const emailKey = String(c.email||"").toLowerCase();
         if (!userTransactions[emailKey]) userTransactions[emailKey] = [];
         userTransactions[emailKey].push({
           date: c.approvedDate || c.date,
@@ -188,7 +188,7 @@ const EXPORTER = {
       // Add debits (redemptions)
       const debits = purchases.filter(c => c.productID === "RED-CASH");
       debits.forEach(c => {
-        const emailKey = c.email.toLowerCase();
+        const emailKey = String(c.email||"").toLowerCase();
         if (!userTransactions[emailKey]) userTransactions[emailKey] = [];
         userTransactions[emailKey].push({
           date: c.date,
@@ -201,7 +201,7 @@ const EXPORTER = {
 
       const finalLedger = [];
       users.forEach(u => {
-        const emailKey = u.email.toLowerCase();
+        const emailKey = String(u.email||"").toLowerCase();
         const txs = userTransactions[emailKey] || [];
         // Sort chronologically oldest first for balance calculations
         txs.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -296,7 +296,7 @@ const EXPORTER = {
       const approvedClaims = purchases.filter(c => c.status === "approved" && c.productID !== "RED-CASH");
       
       const mapped = approvedClaims.map(c => {
-        const user = users.find(u => u.email.toLowerCase() === c.email.toLowerCase());
+        const user = users.find(u => String(u.email||"").toLowerCase() === String(c.email||"").toLowerCase());
         const prod = products.find(p => p.id === c.productID);
         
         let price = 0;
