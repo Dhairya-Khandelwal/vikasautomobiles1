@@ -49,6 +49,23 @@ const AUTH = {
     // Set active session
     AUTH.setCurrentSession(user);
     await window.API.addLog("AUTH_IN", `Successful session logon: ${user.fullname} [Role: ${user.role.toUpperCase()}]`);
+
+    // Mirror this login event to the dedicated "Logins" sheet on the server.
+    // Fire-and-forget: no await on anything critical, and any failure here
+    // is swallowed so it can never break an actual login.
+    if (window.API.isRealBackend()) {
+      window.API.request("log_login", {
+        entry: {
+          userId: user.userId || user.email,
+          fullname: user.fullname,
+          role: user.role,
+          email: user.email,
+          mobile: user.mobile,
+          action: "LOGIN"
+        }
+      }).catch(err => console.warn("Login sheet logging failed (non-blocking):", err));
+    }
+
     return user;
   },
 
@@ -130,6 +147,23 @@ const AUTH = {
   establishSession: async (user) => {
     AUTH.setCurrentSession(user);
     await window.API.addLog("AUTH_IN", `Successful session logon after OTP verification: ${user.fullname} [Role: ${user.role.toUpperCase()}]`);
+
+    // Mirror this login event to the dedicated "Logins" sheet on the server.
+    // Fire-and-forget: no await on anything critical, and any failure here
+    // is swallowed so it can never break an actual login.
+    if (window.API.isRealBackend()) {
+      window.API.request("log_login", {
+        entry: {
+          userId: user.userId || user.email,
+          fullname: user.fullname,
+          role: user.role,
+          email: user.email,
+          mobile: user.mobile,
+          action: "LOGIN"
+        }
+      }).catch(err => console.warn("Login sheet logging failed (non-blocking):", err));
+    }
+
     return user;
   },
 
