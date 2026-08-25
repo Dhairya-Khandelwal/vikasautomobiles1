@@ -19,7 +19,7 @@ const CONFIG = {
     SETTINGS: "vikas_system_settings",
     SESSION: "vikas_current_session",
     BROADCASTS: "vikas_announcements_db",
-    OTP_LOGS: "vikas_otp_logs",
+    LOGINS: "vikas_logins_db",
     QR_CLAIMS: "vikas_qr_claims_db",
     REVIEWS: "vikas_product_reviews_db",
     NOTIFICATIONS: "vikas_notifications_db",
@@ -88,4 +88,3 @@ const CONFIG = {
   ]
 };
 window.CONFIG = CONFIG;
-
