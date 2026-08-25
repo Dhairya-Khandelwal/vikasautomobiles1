@@ -713,22 +713,22 @@
               </button>
             </div>
 
-            <!-- Table 7: OTP Logs -->
+            <!-- Table 7: Login Logs -->
             <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-4 flex flex-col justify-between hover:border-slate-200 transition">
               <div class="space-y-1.5 mb-4">
                 <div class="flex items-center gap-2">
                   <div class="p-1.5 bg-orange-50 text-orange-600 rounded-lg">
-                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
                   </div>
-                  <h4 class="font-bold text-slate-800 text-xs">7. OTP Authentication Logs</h4>
+                  <h4 class="font-bold text-slate-800 text-xs">7. Login Activity Logs</h4>
                 </div>
                 <p class="text-[11px] text-slate-500">
-                  Security logs of 2FA OTP codes issued to users during logins. Tracks generation timestamps, code values, validation outcomes, and usage timestamps.
+                  Chronological record of every successful portal login. Tracks user name, role, email/mobile, and the exact timestamp of each sign-in.
                 </p>
               </div>
-              <button onclick="window.EXPORTER.exportOtpLogs()" class="w-full py-2 bg-slate-50 hover:bg-orange-50 hover:text-orange-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-orange-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <button onclick="window.EXPORTER.exportLoginLogs()" class="w-full py-2 bg-slate-50 hover:bg-orange-50 hover:text-orange-600 text-slate-600 font-bold text-xs rounded-lg border border-slate-200 hover:border-orange-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                <span>Export OTP Logs</span>
+                <span>Export Login Logs</span>
               </button>
             </div>
 
