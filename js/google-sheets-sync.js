@@ -14,6 +14,7 @@ const GOOGLE_SYNC = {
     products: ["id", "name", "brand", "category", "mrp", "packSize", "retailerPrice", "mechanicPrice", "retailerPoints", "mechanicPoints"],
     purchases: ["id", "email", "fullname", "role", "firmName", "productID", "productName", "quantity", "pointsCalculated", "status", "date"],
     logs: ["timestamp", "tag", "text"],
+    logins: ["timestamp", "userId", "fullname", "role", "email", "mobile", "action"],
     settings: ["retailerMultiplier", "mechanicMultiplier", "silverThreshold", "goldThreshold"],
     broadcasts: ["id", "subject", "body", "target", "channel", "date"]
   },
@@ -626,7 +627,7 @@ const GOOGLE_SYNC = {
         logs: window.UTILS.getLocal(keys.LOGS) || [],
         settings: window.UTILS.getLocal(keys.SETTINGS) || [],
         broadcasts: window.UTILS.getLocal(keys.BROADCASTS) || [],
-        otp_logs: window.UTILS.getLocal(keys.OTP_LOGS) || []
+        logins: window.UTILS.getLocal(keys.LOGINS) || []
       };
 
       const fileContent = JSON.stringify(backupData, null, 2);
