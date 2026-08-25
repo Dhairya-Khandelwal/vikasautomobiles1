@@ -249,21 +249,22 @@ const EXPORTER = {
     }
   },
 
-  // 7. OTP LOGS EXPORTER
-  exportOtpLogs: async () => {
+  // 7. LOGIN LOGS EXPORTER
+  exportLoginLogs: async () => {
     try {
-      const otpLogs = await window.API.getOtpLogs();
-      const mapped = otpLogs.map(o => ({
-        "Date & Time": o.timestamp ? window.UTILS.formatDate(o.timestamp) : "-",
-        "Mobile": o.mobile || "-",
-        "Email": o.email || "-",
-        "OTP": o.otp || "-",
-        "Status": o.status || "-",
-        "Used At": o.usedAt && o.usedAt !== "-" ? window.UTILS.formatDate(o.usedAt) : "-"
+      const loginLogs = await window.API.getLogins();
+      const mapped = loginLogs.map(l => ({
+        "Date & Time": l.timestamp ? window.UTILS.formatDate(l.timestamp) : "-",
+        "User ID": l.userId || "-",
+        "Name": l.fullname || "-",
+        "Role": l.role || "-",
+        "Email": l.email || "-",
+        "Mobile": l.mobile || "-",
+        "Action": l.action || "LOGIN"
       }));
-      EXPORTER.downloadCSV("OTP_Logs.csv", mapped);
+      EXPORTER.downloadCSV("Login_Logs.csv", mapped);
     } catch (e) {
-      window.UTILS.showToast("Failed to compile OTP verification logs report.", "error");
+      window.UTILS.showToast("Failed to compile login logs report.", "error");
     }
   },
 
