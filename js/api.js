@@ -203,29 +203,6 @@ const API = {
       window.UTILS.setLocal(keys.QR_CLAIMS, window.CONFIG.DEFAULT_QR_CLAIMS || []);
     }
 
-    // Seed OTP Logs
-    if (!localStorage.getItem(keys.OTP_LOGS)) {
-      const seedOtpLogs = [
-        {
-          timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
-          mobile: "9876543210",
-          email: "retailer@vikas.com",
-          otp: "582103",
-          status: "verified",
-          usedAt: new Date(Date.now() - 3600000 * 3.9).toISOString()
-        },
-        {
-          timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
-          mobile: "9112233445",
-          email: "mechanic@vikas.com",
-          otp: "904128",
-          status: "verified",
-          usedAt: new Date(Date.now() - 3600000 * 1.95).toISOString()
-        }
-      ];
-      window.UTILS.setLocal(keys.OTP_LOGS, seedOtpLogs);
-    }
-
     // Seed initial security audit logs
     if (!localStorage.getItem(keys.LOGS)) {
       window.UTILS.setLocal(keys.LOGS, [
@@ -662,36 +639,33 @@ const API = {
     return { success: true };
   },
 
-  // 7. OTP LOGS API ENDPOINTS
-  getOtpLogs: async () => {
-    return window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.OTP_LOGS) || [];
+  // 7. LOGIN LOGS API ENDPOINTS
+  // A dedicated login/logout audit trail, separate from the generic system
+  // Logs (which mixes in product edits, claim approvals, etc). When a real
+  // GAS backend is configured, entries are appended to the "Logins" sheet
+  // there; otherwise they fall back to local browser storage like every
+  // other table in offline/demo mode.
+  getLogins: async () => {
+    if (API.isRealBackend()) {
+      return (await API.request("get_logins")).data;
+    }
+    return window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.LOGINS) || [];
   },
 
-  addOtpLog: async (mobile, email, otp, status, usedAt = "-") => {
-    const logs = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.OTP_LOGS) || [];
+  logLoginEvent: async (entry) => {
+    if (API.isRealBackend()) {
+      // Fire-and-forget: never let a logging failure block a real login.
+      return API.request("log_login", { entry }).catch(err => {
+        console.warn("Login sheet logging failed (non-blocking):", err);
+      });
+    }
+    const logs = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.LOGINS) || [];
     logs.unshift({
       timestamp: new Date().toISOString(),
-      mobile,
-      email,
-      otp,
-      status,
-      usedAt
+      ...entry
     });
-    if (logs.length > 500) logs.pop();
-    window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.OTP_LOGS, logs);
-  },
-
-  updateOtpLogStatus: async (emailOrMobile, status) => {
-    const logs = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.OTP_LOGS) || [];
-    const q = emailOrMobile.trim().toLowerCase();
-    const logIndex = logs.findIndex(l => 
-      (String(l.email||"").toLowerCase() === q || l.mobile === q) && l.status === "sent"
-    );
-    if (logIndex !== -1) {
-      logs[logIndex].status = status;
-      logs[logIndex].usedAt = status === "verified" ? new Date().toISOString() : "-";
-      window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.OTP_LOGS, logs);
-    }
+    if (logs.length > 2000) logs.pop();
+    window.UTILS.setLocal(window.CONFIG.STORAGE_KEYS.LOGINS, logs);
   },
 
   // 8. QR CODE CLAIMS API ENDPOINTS
