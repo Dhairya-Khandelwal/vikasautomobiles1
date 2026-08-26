@@ -488,12 +488,12 @@ async function loadLedgerStatement() {
       if (c.status === "approved") statusClass = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
       if (c.status === "rejected") statusClass = "text-red-400 bg-red-500/10 border-red-500/20";
 
-      return `
-        <tr class="border-b border-slate-800/40 text-[11px]">
-          <td class="py-2.5 font-mono">${window.UTILS.formatDate(c.date)}</td>
-          <td class="py-2.5 font-sans font-bold text-white">${c.productName}<br><span class="text-[9px] font-mono text-slate-500 font-normal">SKU: ${c.productID} | Claim ID: ${c.id}</span></td>
-          <td class="py-2.5 font-mono uppercase text-slate-400">QR CLAIM</td>
-          <td class="py-2.5 font-mono font-bold text-emerald-400">+${c.pointsCalculated}</td>
+            return `
+        <tr class="border-b border-slate-100 text-[11px]">
+          <td class="py-2.5 font-mono text-slate-700">${window.UTILS.formatDate(c.date)}</td>
+          <td class="py-2.5 font-sans font-bold text-slate-800">${c.productName}<br><span class="text-[9px] font-mono text-slate-400 font-normal">SKU: ${c.productID} | Claim ID: ${c.id}</span></td>
+          <td class="py-2.5 font-mono uppercase text-slate-500">QR CLAIM</td>
+          <td class="py-2.5 font-mono font-bold text-emerald-600">+${c.pointsCalculated}</td>
           <td class="py-2.5">
             <span class="px-1.5 py-0.5 border text-[8px] font-bold rounded font-mono uppercase ${statusClass}">${c.status}</span>
           </td>
