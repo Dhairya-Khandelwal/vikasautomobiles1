@@ -780,10 +780,16 @@ async function savePurchaseClaimEvaluation(event) {
 
   window.UTILS.showLoader("Applying verification verdict...");
   try {
-    // Save to comment history first
-    await window.API.addClaimRemarkHistory(claimID, remark);
-    // Process the final approval or rejection status
+    // Process the final approval or rejection status first — this is the critical action.
     await window.API.processPurchaseClaim(claimID, status, remark);
+    // Save to comment history as a best-effort, secondary step so a failure here
+    // (e.g. remark-history not yet supported on the live backend) never blocks
+    // or reverses the approval/rejection that already succeeded above.
+    try {
+      await window.API.addClaimRemarkHistory(claimID, remark);
+    } catch (historyErr) {
+      console.warn("Claim remark history could not be saved (non-blocking):", historyErr);
+    }
     window.UTILS.showToast(`Points claim was successfully ${status}!`, "success");
     closePurchaseClaimModal();
     await loadPendingClaims();
