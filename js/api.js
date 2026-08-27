@@ -1004,6 +1004,9 @@ const API = {
 
   // === 12. ADVANCED BULK USER & PROFILE MANAGEMENT ===
   bulkApproveUsers: async (emails) => {
+    if (API.isRealBackend()) {
+      return await API.request("bulk_approve_users", { emails });
+    }
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
     let count = 0;
     users.forEach(u => {
@@ -1022,6 +1025,9 @@ const API = {
   },
 
   bulkDeleteUsers: async (emails) => {
+    if (API.isRealBackend()) {
+      return await API.request("bulk_delete_users", { emails });
+    }
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
     const filtered = users.filter(u => !emails.includes(u.email));
     const deletedCount = users.length - filtered.length;
@@ -1031,6 +1037,9 @@ const API = {
   },
 
   setUserSuspendedState: async (email, isSuspended) => {
+    if (API.isRealBackend()) {
+      return await API.request("set_user_suspended_state", { email, isSuspended });
+    }
     const users = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.USERS);
     const idx = users.findIndex(u => String(u.email||"").toLowerCase() === email.toLowerCase());
     if (idx !== -1) {
@@ -1044,6 +1053,9 @@ const API = {
 
   // === 13. ADVANCED CLAIM REMARKS & BULK CLAIMS PROCESSING ===
   addClaimRemarkHistory: async (claimId, remarkText) => {
+    if (API.isRealBackend()) {
+      return await API.request("add_claim_remark_history", { claimId, remarkText });
+    }
     const purchases = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.PURCHASES);
     const idx = purchases.findIndex(p => p.id === claimId);
     if (idx !== -1) {
@@ -1067,6 +1079,9 @@ const API = {
   },
 
   bulkApproveClaims: async (claimIds) => {
+    if (API.isRealBackend()) {
+      return await API.request("bulk_approve_claims", { claimIds });
+    }
     const purchases = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.PURCHASES);
     let count = 0;
     const session = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.SESSION, null);
@@ -1099,6 +1114,9 @@ const API = {
   },
 
   bulkRejectClaims: async (claimIds, reason = "Bulk administrative rejection") => {
+    if (API.isRealBackend()) {
+      return await API.request("bulk_reject_claims", { claimIds, reason });
+    }
     const purchases = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.PURCHASES);
     let count = 0;
     const session = window.UTILS.getLocal(window.CONFIG.STORAGE_KEYS.SESSION, null);
