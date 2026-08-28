@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vikas Automobiles — Signing you in…</title>
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-slate-50">
+
+  <div class="max-w-sm w-full mx-4 bg-white border border-slate-200 rounded-3xl shadow-xl p-8 text-center space-y-4">
+    <div id="sso-spinner" class="flex justify-center">
+      <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+    </div>
+    <div id="sso-icon-error" class="hidden justify-center text-rose-500">
+      <i data-lucide="shield-x" class="w-10 h-10"></i>
+    </div>
+    <h1 id="sso-title" class="text-base font-black text-slate-800 uppercase tracking-wide">Signing you in…</h1>
+    <p id="sso-message" class="text-xs text-slate-500 leading-relaxed">
+      Verifying your one-time portal login link. Please wait a moment.
+    </p>
+    <a id="sso-login-link" href="login.html" class="hidden inline-block mt-2 text-xs font-bold text-blue-600 hover:underline">
+      Go to normal login
+    </a>
+  </div>
+
+  <!-- Existing app scripts, same load order as login.html, so window.CONFIG /
+       window.API / window.AUTH / window.UTILS behave exactly as everywhere
+       else in the portal. No new session system is introduced. -->
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    (function () {
+      const titleEl = document.getElementById("sso-title");
+      const msgEl = document.getElementById("sso-message");
+      const spinnerEl = document.getElementById("sso-spinner");
+      const errorIconEl = document.getElementById("sso-icon-error");
+      const loginLinkEl = document.getElementById("sso-login-link");
+
+      function showError(message) {
+        spinnerEl.classList.add("hidden");
+        errorIconEl.classList.remove("hidden");
+        errorIconEl.classList.add("flex");
+        titleEl.textContent = "Login link problem";
+        titleEl.classList.remove("text-slate-800");
+        titleEl.classList.add("text-rose-600");
+        msgEl.textContent = message;
+        loginLinkEl.classList.remove("hidden");
+        if (window.lucide) window.lucide.createIcons();
+        // Give the person time to read the error before bouncing them.
+        setTimeout(() => window.location.replace("login.html"), 4000);
+      }
+
+      async function run() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+
+        // Strip the token out of the visible/history URL immediately,
+        // regardless of outcome, so it never lingers in browser history.
+        if (token) {
+          history.replaceState(null, "", window.location.pathname);
+        }
+
+        if (!token) {
+          showError("No login token was provided. Please generate a new link from the Google Sheet.");
+          return;
+        }
+
+        try {
+          const result = await window.API.request("sso_login", { token });
+
+          if (!result || !result.success || !result.user) {
+            throw new Error((result && result.error) || "This login link is invalid.");
+          }
+
+          const user = result.user;
+
+          // Use the EXISTING session mechanism — no parallel auth system.
+          if (window.AUTH && typeof window.AUTH.establishSession === "function") {
+            await window.AUTH.establishSession(user);
+          } else {
+            // Extremely defensive fallback; should never trigger since
+            // auth.js is loaded above and always defines this.
+            window.AUTH.setCurrentSession(user);
+          }
+
+          titleEl.textContent = "Signed in — redirecting…";
+          msgEl.textContent = `Welcome, ${user.fullname || "partner"}.`;
+
+          window.AUTH.redirectByRole(user);
+        } catch (err) {
+          console.error("SSO login failed:", err);
+          showError(err.message || "This login link is invalid, expired, or has already been used.");
+        }
+      }
+
+      run();
+    })();
+  </script>
+</body>
+</html>
